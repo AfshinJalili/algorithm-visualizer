@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { BaseComponent } from 'components';
+import BaseComponent from 'components/BaseComponent';
 import { actions } from 'reducers';
 import styles from './VisualizationViewer.module.scss';
 import * as TracerClasses from 'core/tracers';

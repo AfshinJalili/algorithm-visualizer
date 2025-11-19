@@ -1,10 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import faExclamationCircle from '@fortawesome/fontawesome-free-solid/faExclamationCircle';
-import faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner';
+import { faExclamationCircle, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { classes } from 'common/util';
-import { Ellipsis } from 'components';
+import Ellipsis from 'components/Ellipsis';
 import styles from './Button.module.scss';
 
 class Button extends React.Component {

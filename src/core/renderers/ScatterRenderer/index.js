@@ -22,7 +22,11 @@ class ScatterRenderer extends Array2DRenderer {
     }
 
     return <Scatter data={chartData} options={{
-      legend: false,
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
       animation: false,
       layout: {
         padding: {
@@ -33,18 +37,12 @@ class ScatterRenderer extends Array2DRenderer {
         },
       },
       scales: {
-        yAxes: [
-          {
-            ticks: {
-              beginAtZero: false,
-            },
-          }],
-        xAxes: [
-          {
-            ticks: {
-              beginAtZero: false,
-            },
-          }],
+        y: {
+          beginAtZero: false,
+        },
+        x: {
+          beginAtZero: false,
+        },
       },
     }}/>
   }

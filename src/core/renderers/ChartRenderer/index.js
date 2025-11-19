@@ -17,14 +17,16 @@ class ChartRenderer extends Array1DRenderer {
     return (
       <Bar data={chartData} options={{
         scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true
-            }
-          }]
+          y: {
+            beginAtZero: true
+          }
         },
         animation: false,
-        legend: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
         responsive: true,
         maintainAspectRatio: false
       }} />

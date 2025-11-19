@@ -1,7 +1,13 @@
 import { createProjectFile, createUserFile } from 'common/util';
 
+// Vite import.meta.glob for raw file imports
+const fileModules = import.meta.glob('./**/*.{md,cpp,java,js}', { 
+  as: 'raw',
+  eager: true 
+});
+
 const getName = filePath => filePath.split('/').pop();
-const getContent = filePath => require('!raw-loader!./' + filePath).default;
+const getContent = filePath => fileModules[`./${filePath}`];
 const readProjectFile = filePath => createProjectFile(getName(filePath), getContent(filePath));
 const readUserFile = filePath => createUserFile(getName(filePath), getContent(filePath));
 

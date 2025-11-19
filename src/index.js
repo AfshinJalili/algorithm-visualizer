@@ -1,22 +1,26 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { combineReducers, createStore } from 'redux';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { Provider } from 'react-redux';
-import { routerReducer } from 'react-router-redux';
+import { Chart, CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import App from 'components/App';
 import * as reducers from 'reducers';
 import './stylesheet.scss';
 
-const store = createStore(combineReducers({ ...reducers, routing: routerReducer }));
+Chart.register(CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend);
 
-ReactDOM.render(
+const store = createStore(combineReducers(reducers));
+
+const root = createRoot(document.getElementById('root'));
+root.render(
   <Provider store={store}>
     <BrowserRouter>
-      <Switch>
-        <Route exact path="/scratch-paper/:gistId" component={App}/>
-        <Route exact path="/:categoryKey/:algorithmKey" component={App}/>
-        <Route path="/" component={App}/>
-      </Switch>
+      <Routes>
+        <Route path="/scratch-paper/:gistId" element={<App/>}/>
+        <Route path="/:categoryKey/:algorithmKey" element={<App/>}/>
+        <Route path="/" element={<App/>}/>
+      </Routes>
     </BrowserRouter>
-  </Provider>, document.getElementById('root'));
+  </Provider>
+);

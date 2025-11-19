@@ -1,11 +1,12 @@
 import React from 'react';
-import faTrashAlt from '@fortawesome/fontawesome-free-solid/faTrashAlt';
-import faUser from '@fortawesome/fontawesome-free-solid/faUser';
+import { faTrashAlt, faUser } from '@fortawesome/free-solid-svg-icons';
 import { classes, extension } from 'common/util';
 import { actions } from 'reducers';
 import { connect } from 'react-redux';
 import { languages } from 'common/config';
-import { Button, Ellipsis, FoldableAceEditor } from 'components';
+import Button from 'components/Button';
+import Ellipsis from 'components/Ellipsis';
+import FoldableAceEditor from 'components/FoldableAceEditor';
 import styles from './CodeEditor.module.scss';
 
 class CodeEditor extends React.Component {

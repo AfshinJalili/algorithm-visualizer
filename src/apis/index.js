@@ -82,23 +82,53 @@ const TracerApi = {
     args: ['markdown'],
   }]),
   json: ({ code }) => new Promise(resolve => resolve(JSON.parse(code))),
-  js: ({ code }, params, cancelToken) => new Promise((resolve, reject) => {
-    const worker = new Worker('/api/tracers/js/worker');
-    if (cancelToken) {
-      cancelToken.promise.then(cancel => {
+  js: ({ code }, params, cancelToken) => new Promise(async (resolve, reject) => {
+    try {
+      const libResponse = await fetch('/api/tracers/js');
+      const libText = await libResponse.text();
+      
+      const workerCode = `
+const process = { env: { ALGORITHM_VISUALIZER: '1' } };
+${libText}
+
+const sandbox = code => {
+  const require = name => ({ 'algorithm-visualizer': AlgorithmVisualizer }[name]);
+  eval(code);
+};
+
+onmessage = e => {
+  const lines = e.data.split('\\n').map((line, i) => line.replace(/(\\.\\s*delay\\s*)\\(\\s*\\)/g, \`\$1(\${i})\`));
+  const code = lines.join('\\n');
+  sandbox(code);
+  postMessage(AlgorithmVisualizer.Commander.commands);
+};
+`;
+      
+      const workerBlob = new Blob([workerCode], { type: 'application/javascript' });
+      const workerUrl = URL.createObjectURL(workerBlob);
+      const worker = new Worker(workerUrl);
+      
+      if (cancelToken) {
+        cancelToken.promise.then(cancel => {
+          worker.terminate();
+          URL.revokeObjectURL(workerUrl);
+          reject(cancel);
+        });
+      }
+      worker.onmessage = e => {
         worker.terminate();
-        reject(cancel);
-      });
-    }
-    worker.onmessage = e => {
-      worker.terminate();
-      resolve(e.data);
-    };
-    worker.onerror = error => {
-      worker.terminate();
+        URL.revokeObjectURL(workerUrl);
+        resolve(e.data);
+      };
+      worker.onerror = error => {
+        worker.terminate();
+        URL.revokeObjectURL(workerUrl);
+        reject(error);
+      };
+      worker.postMessage(code);
+    } catch (error) {
       reject(error);
-    };
-    worker.postMessage(code);
+    }
   }),
   cpp: POST('/tracers/cpp'),
   java: POST('/tracers/java'),

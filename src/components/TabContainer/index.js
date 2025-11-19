@@ -1,8 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import AutosizeInput from 'react-input-autosize';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import faPlus from '@fortawesome/fontawesome-free-solid/faPlus';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
 import { classes } from 'common/util';
 import { actions } from 'reducers';
 import { languages } from 'common/config';
@@ -31,7 +30,7 @@ class TabContainer extends React.Component {
             files.map((file, i) => file === editingFile ? (
               <div className={classes(styles.title, styles.selected)} key={i}
                    onClick={() => this.props.setEditingFile(file)}>
-                <AutosizeInput className={styles.input_title} value={file.name}
+                <input className={styles.input_title} value={file.name}
                                onClick={e => e.stopPropagation()}
                                onChange={e => this.props.renameFile(file, e.target.value)}/>
               </div>

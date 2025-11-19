@@ -4,16 +4,15 @@ import { connect } from 'react-redux';
 import Promise from 'bluebird';
 import { Helmet } from 'react-helmet';
 import queryString from 'query-string';
-import {
-  BaseComponent,
-  CodeEditor,
-  Header,
-  Navigator,
-  ResizableContainer,
-  TabContainer,
-  ToastContainer,
-  VisualizationViewer,
-} from 'components';
+import { withRouter } from 'common/withRouter';
+import BaseComponent from 'components/BaseComponent';
+import CodeEditor from 'components/CodeEditor';
+import Header from 'components/Header';
+import Navigator from 'components/Navigator';
+import ResizableContainer from 'components/ResizableContainer';
+import TabContainer from 'components/TabContainer';
+import ToastContainer from 'components/ToastContainer';
+import VisualizationViewer from 'components/VisualizationViewer';
 import { AlgorithmApi, GitHubApi, VisualizationApi } from 'apis';
 import { actions } from 'reducers';
 import { createUserFile, extension, refineGist } from 'common/util';
@@ -249,6 +248,8 @@ class App extends BaseComponent {
   }
 }
 
-export default connect(({ current, env }) => ({ current, env }), actions)(
-  App,
+export default withRouter(
+  connect(({ current, env }) => ({ current, env }), actions)(
+    App,
+  ),
 );

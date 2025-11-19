@@ -1,5 +1,5 @@
 import React from 'react';
-import { ResizableContainer } from 'components';
+import ResizableContainer from 'components/ResizableContainer';
 import { HorizontalLayout } from 'core/layouts';
 
 class Layout {

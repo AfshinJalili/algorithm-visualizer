@@ -1,16 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import InputRange from 'react-input-range';
 import axios from 'axios';
-import faPlay from '@fortawesome/fontawesome-free-solid/faPlay';
-import faChevronLeft from '@fortawesome/fontawesome-free-solid/faChevronLeft';
-import faChevronRight from '@fortawesome/fontawesome-free-solid/faChevronRight';
-import faPause from '@fortawesome/fontawesome-free-solid/faPause';
-import faWrench from '@fortawesome/fontawesome-free-solid/faWrench';
+import { faPlay, faChevronLeft, faChevronRight, faPause, faWrench } from '@fortawesome/free-solid-svg-icons';
 import { classes, extension } from 'common/util';
 import { TracerApi } from 'apis';
 import { actions } from 'reducers';
-import { BaseComponent, Button, ProgressBar } from 'components';
+import BaseComponent from 'components/BaseComponent';
+import Button from 'components/Button';
+import ProgressBar from 'components/ProgressBar';
 import styles from './Player.module.scss';
 
 class Player extends BaseComponent {
@@ -169,14 +166,14 @@ class Player extends BaseComponent {
                 onClick={() => this.next()}/>
         <div className={styles.speed}>
           Speed
-          <InputRange
-            classNames={{
-              inputRange: styles.range,
-              labelContainer: styles.range_label_container,
-              slider: styles.range_slider,
-              track: styles.range_track,
-            }} minValue={0} maxValue={4} step={.5} value={speed}
-            onChange={speed => this.handleChangeSpeed(speed)}/>
+          <input
+            className={styles.range}
+            type="range"
+            min={0}
+            max={4}
+            step={0.5}
+            value={speed}
+            onChange={e => this.handleChangeSpeed(parseFloat(e.target.value))}/>
         </div>
       </div>
     );

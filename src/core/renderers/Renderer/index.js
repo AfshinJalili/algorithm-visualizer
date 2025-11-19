@@ -1,6 +1,6 @@
 import React from 'react';
 import styles from './Renderer.module.scss';
-import { Ellipsis } from 'components';
+import Ellipsis from 'components/Ellipsis';
 import { classes } from 'common/util';
 
 class Renderer extends React.Component {

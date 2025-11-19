@@ -1,11 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import faSearch from '@fortawesome/fontawesome-free-solid/faSearch';
-import faCode from '@fortawesome/fontawesome-free-solid/faCode';
-import faBook from '@fortawesome/fontawesome-free-solid/faBook';
-import faGithub from '@fortawesome/fontawesome-free-brands/faGithub';
-import { ExpandableListItem, ListItem } from 'components';
+import { faSearch, faCode, faBook } from '@fortawesome/free-solid-svg-icons';
+import { faGithub } from '@fortawesome/free-brands-svg-icons';
+import ExpandableListItem from 'components/ExpandableListItem';
+import ListItem from 'components/ListItem';
 import { classes } from 'common/util';
 import { actions } from 'reducers';
 import styles from './Navigator.module.scss';

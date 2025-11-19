@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../algorithms"
+		},
+		{
+			"path": "../server"
+		}
+	],
+	"settings": {}
+}

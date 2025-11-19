@@ -1,25 +1,29 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
-import AutosizeInput from 'react-input-autosize';
+import { withRouter } from 'common/withRouter';
 import screenfull from 'screenfull';
 import Promise from 'bluebird';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import faAngleRight from '@fortawesome/fontawesome-free-solid/faAngleRight';
-import faCaretDown from '@fortawesome/fontawesome-free-solid/faCaretDown';
-import faCaretRight from '@fortawesome/fontawesome-free-solid/faCaretRight';
-import faCodeBranch from '@fortawesome/fontawesome-free-solid/faCodeBranch';
-import faExpandArrowsAlt from '@fortawesome/fontawesome-free-solid/faExpandArrowsAlt';
-import faGithub from '@fortawesome/fontawesome-free-brands/faGithub';
-import faTrashAlt from '@fortawesome/fontawesome-free-solid/faTrashAlt';
-import faSave from '@fortawesome/fontawesome-free-solid/faSave';
-import faFacebook from '@fortawesome/fontawesome-free-brands/faFacebook';
-import faStar from '@fortawesome/fontawesome-free-solid/faStar';
+import { 
+  faAngleRight, 
+  faCaretDown, 
+  faCaretRight, 
+  faCodeBranch, 
+  faExpandArrowsAlt, 
+  faTrashAlt, 
+  faSave, 
+  faStar 
+} from '@fortawesome/free-solid-svg-icons';
+import { faGithub, faFacebook } from '@fortawesome/free-brands-svg-icons';
 import { GitHubApi } from 'apis';
 import { classes, refineGist } from 'common/util';
 import { actions } from 'reducers';
 import { languages } from 'common/config';
-import { BaseComponent, Button, Ellipsis, ListItem, Player } from 'components';
+import BaseComponent from 'components/BaseComponent';
+import Button from 'components/Button';
+import Ellipsis from 'components/Ellipsis';
+import ListItem from 'components/ListItem';
+import Player from 'components/Player';
 import styles from './Header.module.scss';
 
 class Header extends BaseComponent {
@@ -123,7 +127,7 @@ class Header extends BaseComponent {
               {
                 titles.map((title, i) => [
                   scratchPaper && i === 1 ?
-                    <AutosizeInput className={styles.input_title} key={`title-${i}`} value={title}
+                    <input className={styles.input_title} key={`title-${i}`} value={title}
                                    onClick={e => e.stopPropagation()} onChange={e => this.handleChangeTitle(e)}/> :
                     <Ellipsis key={`title-${i}`}>{title}</Ellipsis>,
                   i < titles.length - 1 &&

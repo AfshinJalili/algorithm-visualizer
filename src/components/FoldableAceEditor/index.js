@@ -1,13 +1,13 @@
 import { connect } from 'react-redux';
 import AceEditor from 'react-ace';
-import 'brace/mode/plain_text';
-import 'brace/mode/markdown';
-import 'brace/mode/json';
-import 'brace/mode/javascript';
-import 'brace/mode/c_cpp';
-import 'brace/mode/java';
-import 'brace/theme/tomorrow_night_eighties';
-import 'brace/ext/searchbox';
+import 'ace-builds/src-noconflict/mode-text';
+import 'ace-builds/src-noconflict/mode-markdown';
+import 'ace-builds/src-noconflict/mode-json';
+import 'ace-builds/src-noconflict/mode-javascript';
+import 'ace-builds/src-noconflict/mode-c_cpp';
+import 'ace-builds/src-noconflict/mode-java';
+import 'ace-builds/src-noconflict/theme-tomorrow_night_eighties';
+import 'ace-builds/src-noconflict/ext-searchbox';
 import { actions } from 'reducers';
 
 class FoldableAceEditor extends AceEditor {
