@@ -14,6 +14,10 @@ class Array2DRenderer extends Renderer {
   renderData() {
     const { data } = this.props.data;
 
+    if (!data || data.length === 0) {
+      return null;
+    }
+
     const isArray1D = this instanceof Array1DRenderer;
     let longestRow = data.reduce((longestRow: any[], row: any[]) => longestRow.length < row.length ? row : longestRow, []);
 
