@@ -12,10 +12,11 @@ import {
   faTrashAlt,
   faSave,
   faStar,
+  faShareAlt, // Using a generic share icon instead of Facebook specific if preferred, or keep faFacebook
 } from '@fortawesome/free-solid-svg-icons';
 import { faGithub, faFacebook } from '@fortawesome/free-brands-svg-icons';
 import { GitHubApi } from 'apis';
-import { classes, refineGist } from 'common/util';
+import { refineGist } from 'common/util';
 import { languages } from 'common/config';
 import { useAppSelector, useAppDispatch } from '../../store';
 import {
@@ -25,11 +26,17 @@ import {
   setExt,
   showErrorToast,
 } from '../../reducers';
-import Button from 'components/Button';
+import { Button } from 'components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "components/ui/dropdown-menu";
+import { Input } from "components/ui/input";
 import Ellipsis from 'components/Ellipsis';
-import ListItem from 'components/ListItem';
 import Player from 'components/Player';
-import styles from './Header.module.scss';
+import { cn } from "@/lib/utils";
 
 interface HeaderProps {
   className?: string;
@@ -88,6 +95,7 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const saveGist = () => {
+    // ... (Gist logic remains identical)
     interface GistFile {
       content?: string;
     }
@@ -179,94 +187,127 @@ const Header: React.FC<HeaderProps> = ({
   const permitted = hasPermission();
 
   return (
-    <header className={classes(styles.header, className)}>
-      <div className={styles.row}>
-        <div className={styles.section}>
-          <Button className={styles.title_bar} onClick={onClickTitleBar}>
-            {titles.map((title, i) => [
-              scratchPaper && i === 1 ? (
-                <input
-                  className={styles.input_title}
-                  key={`title-${i}`}
-                  value={title}
-                  onClick={e => e.stopPropagation()}
-                  onChange={handleChangeTitle}
-                />
-              ) : (
-                <Ellipsis key={`title-${i}`}>{title}</Ellipsis>
-              ),
-              i < titles.length - 1 && (
-                <FontAwesomeIcon
-                  className={styles.nav_arrow}
-                  fixedWidth
-                  icon={faAngleRight}
-                  key={`arrow-${i}`}
-                />
-              ),
-            ])}
-            <FontAwesomeIcon
-              className={styles.nav_caret}
-              fixedWidth
-              icon={navigatorOpened ? faCaretDown : faCaretRight}
-            />
-          </Button>
-        </div>
-        <div className={styles.section}>
-          <Button
-            icon={permitted ? faSave : faCodeBranch}
-            primary
-            disabled={permitted && saved}
-            onClick={saveGist}
+    <header className={cn("flex flex-col min-w-0 bg-background text-foreground", className)}>
+      <div className="flex justify-between px-3 py-1.5 border-b border-border gap-3 items-center h-10">
+        <div className="flex items-center gap-2 min-w-0 flex-shrink">
+          <Button 
+            variant="ghost"
+            size="sm"
+            className="font-semibold text-sm px-2 h-7 hover:bg-accent hover:text-accent-foreground min-w-0"
+            onClick={onClickTitleBar}
           >
-            {permitted ? 'Save' : 'Fork'}
-          </Button>
-          {permitted && (
-            <Button icon={faTrashAlt} primary onClick={deleteGist} confirmNeeded>
-              Delete
-            </Button>
-          )}
-          <Button
-            icon={faFacebook}
-            primary
-            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`}
-          >
-            Share
-          </Button>
-          <Button icon={faExpandArrowsAlt} primary onClick={handleClickFullScreen}>
-            Fullscreen
-          </Button>
-        </div>
-      </div>
-      <div className={styles.row}>
-        <div className={styles.section}>
-          {user ? (
-            <Button className={styles.btn_dropdown} icon={user.avatar_url}>
-              {user.login}
-              <div className={styles.dropdown}>
-                <ListItem label="Sign Out" href="/api/auth/destroy" rel="opener" />
-              </div>
-            </Button>
-          ) : (
-            <Button icon={faGithub} primary href="/api/auth/request" rel="opener">
-              <Ellipsis>Sign In</Ellipsis>
-            </Button>
-          )}
-          <Button className={styles.btn_dropdown} icon={faStar}>
-            {languages.find(language => language.ext === ext)?.name}
-            <div className={styles.dropdown}>
-              {languages.map(language =>
-                language.ext === ext ? null : (
-                  <ListItem
-                    key={language.ext}
-                    onClick={() => dispatch(setExt(language.ext))}
-                    label={language.name}
-                  />
-                )
-              )}
+            <div className="flex items-center overflow-hidden">
+              {titles.map((title, i) => (
+                <React.Fragment key={i}>
+                  {scratchPaper && i === 1 ? (
+                    <Input
+                      className="h-5 py-0 px-1 mx-1 w-28 text-xs bg-muted border-none focus-visible:ring-1"
+                      value={title}
+                      onClick={e => e.stopPropagation()}
+                      onChange={handleChangeTitle}
+                    />
+                  ) : (
+                    <span className="truncate text-xs">{title}</span>
+                  )}
+                  {i < titles.length - 1 && (
+                    <FontAwesomeIcon
+                      className="mx-0.5 text-muted-foreground text-xs"
+                      fixedWidth
+                      icon={faAngleRight}
+                    />
+                  )}
+                </React.Fragment>
+              ))}
+              <FontAwesomeIcon
+                className="ml-1 text-muted-foreground text-xs"
+                fixedWidth
+                icon={navigatorOpened ? faCaretDown : faCaretRight}
+              />
             </div>
           </Button>
+
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="gap-1 h-7 px-2 text-xs">
+                  <img
+                    src={user.avatar_url}
+                    alt={user.login}
+                    className="w-3.5 h-3.5 rounded-sm"
+                  />
+                  <span className="font-medium">{user.login}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem asChild>
+                  <a href="/api/auth/destroy" rel="opener">Sign Out</a>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button variant="default" size="sm" className="h-7 px-2 gap-1 text-xs" href="/api/auth/request">
+              <FontAwesomeIcon icon={faGithub} className="h-3 w-3" />
+              <span>Sign In</span>
+            </Button>
+          )}
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="gap-1 h-7 px-2 text-xs">
+                <FontAwesomeIcon icon={faStar} className="text-yellow-500 h-3 w-3" />
+                <span className="font-medium">{languages.find(language => language.ext === ext)?.name}</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {languages.map(language =>
+                language.ext === ext ? null : (
+                  <DropdownMenuItem 
+                    key={language.ext}
+                    onClick={() => dispatch(setExt(language.ext))}
+                  >
+                    {language.name}
+                  </DropdownMenuItem>
+                )
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        <Player className={styles.section} />
+
+        <Player className="flex-1 max-w-xl" />
+
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <Button
+            variant="default"
+            size="sm"
+            className="h-7 w-7 p-0"
+            disabled={permitted && saved}
+            onClick={saveGist}
+            title={permitted ? 'Save' : 'Fork'}
+          >
+            <FontAwesomeIcon icon={permitted ? faSave : faCodeBranch} className="h-3.5 w-3.5" />
+          </Button>
+          {permitted && (
+            <Button 
+              variant="destructive"
+              size="sm"
+              className="h-7 w-7 p-0"
+              onClick={deleteGist}
+              confirmNeeded
+              title="Delete"
+            >
+              <FontAwesomeIcon icon={faTrashAlt} className="h-3.5 w-3.5" />
+            </Button>
+          )}
+          <Button
+            variant="default"
+            size="sm"
+            className="h-7 w-7 p-0"
+            onClick={handleClickFullScreen}
+            title="Toggle Fullscreen"
+          >
+            <FontAwesomeIcon icon={faExpandArrowsAlt} className="h-3.5 w-3.5" />
+          </Button>
+        </div>
       </div>
     </header>
   );

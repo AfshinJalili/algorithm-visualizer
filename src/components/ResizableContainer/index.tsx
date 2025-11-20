@@ -1,7 +1,10 @@
-import React, { ReactNode, forwardRef, useImperativeHandle, useState } from 'react';
-import { classes } from 'common/util';
-import Divider from 'components/Divider';
-import styles from './ResizableContainer.module.scss';
+import React, { ReactNode, forwardRef, useImperativeHandle } from 'react';
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "components/ui/resizable";
+import { cn } from "@/lib/utils";
 
 interface ResizableContainerProps {
   className?: string;
@@ -16,85 +19,90 @@ export interface ResizableContainerRef {
   forceUpdate: () => void;
 }
 
+// Shadcn's Resizable (react-resizable-panels) uses "defaultSize" (percentage) or imperative API for sizing.
+// Our existing logic uses explicit "weights" passed from parent state (Redux) and expects to control them.
+// `react-resizable-panels` is uncontrolled by default but provides `onLayout` callback to sync state.
+// To make it fully controlled or at least sync with our Redux state, we can use `defaultSize` initially 
+// and update the Redux state via `onLayout`.
+// However, `react-resizable-panels` documentation advises against controlling `defaultSize` dynamically 
+// to drive resizing from outside unless you remount the component or use the imperative API.
+// Given we want to persist layouts, we'll map our "weights" (which are ratios) to percentages.
+
 const ResizableContainer = forwardRef<ResizableContainerRef, ResizableContainerProps>(
   ({ className, children, horizontal, weights, visibles, onChangeWeights }, ref) => {
-    const [, setUpdateTrigger] = useState(0);
-
+    
+    // Provide a dummy forceUpdate to satisfy the Ref interface, 
+    // though Shadcn/Radix handles layout updates automatically.
     useImperativeHandle(ref, () => ({
       forceUpdate: () => {
-        setUpdateTrigger(prev => prev + 1);
+        // No-op for this implementation as react-resizable-panels handles resize events internally
       },
     }));
 
-    const handleResize = (
-      prevIndex: number,
-      index: number,
-      targetElement: HTMLElement,
-      clientX: number,
-      clientY: number
-    ) => {
+    // Calculate total weight of VISIBLE panels only
+    const validIndices: number[] = [];
+    children.forEach((_, i) => {
+       if (!visibles || visibles[i]) {
+         validIndices.push(i);
+       }
+    });
+
+    const totalWeight = validIndices.reduce((sum, index) => sum + weights[index], 0);
+    
+    // Map visible children to Panels
+    const panels: ReactNode[] = [];
+    validIndices.forEach((originalIndex, i) => {
+      const child = children[originalIndex];
+      const weight = weights[originalIndex];
+      const percentage = (weight / totalWeight) * 100;
+      
+      // Add Handle before every panel except the first one
+      if (i > 0) {
+        panels.push(<ResizableHandle key={`handle-${originalIndex}`} />);
+      }
+      
+      panels.push(
+        <ResizablePanel 
+          key={`panel-${originalIndex}`}
+          defaultSize={percentage}
+          minSize={0} // Allow collapsing
+          className="flex flex-col min-h-0 min-w-0 overflow-hidden bg-background"
+        >
+          {child}
+        </ResizablePanel>
+      );
+    });
+
+    const handleLayout = (sizes: number[]) => {
+      // sizes are percentages of the visible group.
+      // We need to map these back to the original weights structure.
+      // We'll assume the total weight should remain constant or just distribute 100 units.
+      // But existing app might expect specific weight sums. 
+      // Let's just normalize the visible weights based on the new sizes 
+      // and keep invisible weights as is.
+      
+      // The `onChangeWeights` expects the full array of weights (including invisible ones).
       const newWeights = [...weights];
-
-      const { left, top } = targetElement.getBoundingClientRect();
-      const { offsetWidth, offsetHeight } = targetElement.parentElement!;
-      const position = horizontal ? clientX - left : clientY - top;
-      const containerSize = horizontal ? offsetWidth : offsetHeight;
-
-      let totalWeight = 0;
-      let subtotalWeight = 0;
-      newWeights.forEach((weight, i) => {
-        if (visibles && !visibles[i]) return;
-        totalWeight += weight;
-        if (i < index) subtotalWeight += weight;
+      
+      // sizes[i] corresponds to validIndices[i]
+      sizes.forEach((size, i) => {
+        const originalIndex = validIndices[i];
+        // If totalWeight was, say, 10, and size is 50%, new weight is 5.
+        // This preserves the scale of weights the app expects.
+        newWeights[originalIndex] = (size / 100) * totalWeight;
       });
-      const newWeight = (position / containerSize) * totalWeight;
-      let deltaWeight = newWeight - subtotalWeight;
-      deltaWeight = Math.max(deltaWeight, -newWeights[prevIndex]);
-      deltaWeight = Math.min(deltaWeight, newWeights[index]);
-      newWeights[prevIndex] += deltaWeight;
-      newWeights[index] -= deltaWeight;
+      
       onChangeWeights(newWeights);
     };
 
-    const elements: ReactNode[] = [];
-    let lastIndex = -1;
-    const totalWeight = weights
-      .filter((weight, i) => !visibles || visibles[i])
-      .reduce((sumWeight, weight) => sumWeight + weight, 0);
-
-    (children as ReactNode[]).forEach((child, i) => {
-      if (!visibles || visibles[i]) {
-        if (lastIndex !== -1) {
-          const prevIndex = lastIndex;
-          elements.push(
-            <Divider
-              key={`divider-${i}`}
-              horizontal={horizontal}
-              onResize={(target, dx, dy) => handleResize(prevIndex, i, target, dx, dy)}
-            />
-          );
-        }
-        elements.push(
-          <div
-            key={i}
-            className={classes(styles.wrapper)}
-            style={{
-              flexGrow: weights[i] / totalWeight,
-            }}
-          >
-            {child}
-          </div>
-        );
-        lastIndex = i;
-      }
-    });
-
     return (
-      <div
-        className={classes(styles.resizable_container, horizontal && styles.horizontal, className)}
+      <ResizablePanelGroup
+        direction={horizontal ? "horizontal" : "vertical"}
+        className={cn("w-full h-full", className)}
+        onLayout={handleLayout}
       >
-        {elements}
-      </div>
+        {panels}
+      </ResizablePanelGroup>
     );
   }
 );

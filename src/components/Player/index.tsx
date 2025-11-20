@@ -7,13 +7,14 @@ import {
   faPause,
   faWrench,
 } from '@fortawesome/free-solid-svg-icons';
-import { classes, extension } from 'common/util';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { extension } from 'common/util';
 import { TracerApi } from 'apis';
 import { useAppSelector, useAppDispatch } from '../../store';
 import { setChunks, setCursor, setLineIndicator, showErrorToast } from '../../reducers';
-import Button from 'components/Button';
-import ProgressBar from 'components/ProgressBar';
-import styles from './Player.module.scss';
+import { Button } from "components/ui/button";
+import { Slider } from "components/ui/slider";
+import { cn } from "@/lib/utils";
 import { File } from '../../types';
 
 interface PlayerProps {
@@ -67,7 +68,7 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
       const commandsCopy = [...commands];
       while (commandsCopy.length) {
         const command = commandsCopy.shift()!;
-        const { key, method, args } = command;
+        const { key, method, args } = command as any;
         if (key === null && method === 'delay') {
           const [lineNumber] = args;
           newChunks[newChunks.length - 1].lineNumber = lineNumber;
@@ -76,7 +77,7 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
             lineNumber: undefined,
           });
         } else {
-          newChunks[newChunks.length - 1].commands.push(command);
+          (newChunks[newChunks.length - 1].commands as any[]).push(command);
         }
       }
       dispatch(setChunks(newChunks));
@@ -107,14 +108,14 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
           .then((commands: unknown) => {
             tracerApiSourceRef.current = null;
             setBuilding(false);
-            reset(commands);
+            reset(commands as any[]);
             dispatch(setCursor(1));
           })
           .catch((error: unknown) => {
             if (axios.isCancel(error)) return;
             tracerApiSourceRef.current = null;
             setBuilding(false);
-            handleError(error);
+            handleError(error as Error);
           });
       } else {
         setBuilding(false);
@@ -214,49 +215,59 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
   }, []);
 
   return (
-    <div className={classes(styles.player, className)}>
+    <div className={cn("flex items-center gap-1.5", className)}>
       <Button
-        icon={faWrench}
-        primary
+        variant="default"
+        size="sm"
+        className="h-7 px-2 gap-1 text-xs"
         disabled={building}
-        inProgress={building}
         onClick={() => build(editingFile)}
+        icon={faWrench}
       >
         {building ? 'Building' : 'Build'}
       </Button>
-      {playing ? (
-        <Button icon={faPause} primary active onClick={pause}>
-          Pause
+      
+      <div className="flex items-center gap-0.5">
+        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" disabled={!isValidCursor(cursor - 1)} onClick={prev}>
+          <FontAwesomeIcon icon={faChevronLeft} className="h-3 w-3" />
         </Button>
-      ) : (
-        <Button icon={faPlay} primary onClick={play}>
-          Play
+        
+        {playing ? (
+          <Button variant="default" size="sm" className="h-7 w-7 p-0" onClick={pause}>
+            <FontAwesomeIcon icon={faPause} className="h-3 w-3" />
+          </Button>
+        ) : (
+          <Button variant="default" size="sm" className="h-7 w-7 p-0" onClick={play}>
+            <FontAwesomeIcon icon={faPlay} className="h-3 w-3" />
+          </Button>
+        )}
+
+        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" disabled={!isValidCursor(cursor + 1)} onClick={next}>
+          <FontAwesomeIcon icon={faChevronRight} className="h-3 w-3" />
         </Button>
-      )}
-      <Button icon={faChevronLeft} primary disabled={!isValidCursor(cursor - 1)} onClick={prev} />
-      <ProgressBar
-        className={styles.progress_bar}
-        current={cursor}
-        total={chunks.length}
-        onChangeProgress={handleChangeProgress}
-      />
-      <Button
-        icon={faChevronRight}
-        reverse
-        primary
-        disabled={!isValidCursor(cursor + 1)}
-        onClick={next}
-      />
-      <div className={styles.speed}>
-        Speed
-        <input
-          className={styles.range}
-          type="range"
+      </div>
+
+      <div className="flex items-center gap-2 flex-shrink-0 min-w-[180px]">
+        <Slider
+          defaultValue={[0]}
+          max={chunks.length || 1}
+          step={1}
+          value={[cursor]}
+          onValueChange={(vals) => handleChangeProgress(vals[0] / (chunks.length || 1))}
+          className="w-32"
+        />
+        <span className="text-xs text-muted-foreground whitespace-nowrap">{cursor} / {chunks.length}</span>
+      </div>
+
+      <div className="flex items-center gap-2 flex-shrink-0 min-w-[140px]">
+        <span className="text-xs text-muted-foreground">Speed</span>
+        <Slider
           min={0}
           max={4}
           step={0.5}
-          value={speed}
-          onChange={e => setSpeed(parseFloat(e.target.value))}
+          value={[speed]}
+          onValueChange={(vals) => setSpeed(vals[0])}
+          className="w-24"
         />
       </div>
     </div>

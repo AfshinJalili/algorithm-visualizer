@@ -112,11 +112,15 @@ const currentSlice = createSlice({
     },
     deleteFile: (state, action: PayloadAction<File>) => {
       const file = action.payload;
-      const index = state.files.indexOf(file);
-      state.files = state.files.filter(f => f !== file);
-      state.editingFile = state.files[Math.min(index, state.files.length - 1)];
-      state.shouldBuild = true;
-      state.saved = isSaved(state);
+      // Find by name instead of reference to handle immutable updates
+      const index = state.files.findIndex(f => f.name === file.name);
+      if (index !== -1) {
+        state.files.splice(index, 1);
+        // Set editing file to previous or next file
+        state.editingFile = state.files[Math.min(index, state.files.length - 1)];
+        state.shouldBuild = true;
+        state.saved = isSaved(state);
+      }
     },
   },
 });

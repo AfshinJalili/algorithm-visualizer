@@ -4,7 +4,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExclamationCircle, faSpinner, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { classes } from 'common/util';
 import Ellipsis from 'components/Ellipsis';
-import styles from './Button.module.scss';
+import { Button as ShadcnButton } from "components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface ButtonProps extends Omit<React.HTMLAttributes<HTMLElement>, 'onClick'> {
   className?: string;
@@ -49,16 +50,12 @@ const Button: React.FC<ButtonProps> = ({
     };
   }, []);
 
-  let finalClassName = className;
-  let finalChildren = children;
-  let finalIcon = iconProp;
-  let finalTo = to;
-  let finalHref = href;
   let finalOnClick = onClick;
+  let finalIcon = iconProp;
+  let finalChildren = children;
 
   if (confirmNeeded) {
     if (confirming) {
-      finalClassName = classes(styles.confirming, className);
       finalIcon = faExclamationCircle;
       finalChildren = <Ellipsis key="text">Click to Confirm</Ellipsis>;
       const onClickOriginal = onClick;
@@ -71,8 +68,6 @@ const Button: React.FC<ButtonProps> = ({
         }
       };
     } else {
-      finalTo = null;
-      finalHref = null;
       finalOnClick = () => {
         setConfirming(true);
         timeoutRef.current = window.setTimeout(() => {
@@ -83,49 +78,82 @@ const Button: React.FC<ButtonProps> = ({
     }
   }
 
-  const iconOnly = !finalChildren;
-  const props = {
-    className: classes(
-      styles.button,
-      reverse && styles.reverse,
-      selected && styles.selected,
-      disabled && styles.disabled,
-      primary && styles.primary,
-      active && styles.active,
-      iconOnly && styles.icon_only,
-      finalClassName
-    ),
-    to: disabled ? null : finalTo,
-    href: disabled ? null : finalHref,
-    onClick: disabled ? null : finalOnClick,
-    children: [
-      finalIcon &&
-        (typeof finalIcon === 'string' ? (
-          <div
-            className={classes(styles.icon, styles.image)}
-            key="icon"
-            style={{ backgroundImage: `url(${finalIcon})` }}
-          />
-        ) : (
-          <FontAwesomeIcon
-            className={styles.icon}
-            fixedWidth
-            icon={inProgress ? faSpinner : finalIcon}
-            spin={inProgress}
-            key="icon"
-          />
-        )),
-      finalChildren,
-    ],
-    ...rest,
-  };
-
-  return finalTo ? (
-    <Link {...props} to={finalTo} />
-  ) : finalHref ? (
-    <a rel="noopener" target="_blank" {...props} href={finalHref} />
-  ) : (
-    <div {...props} />
+  const variant = primary ? "default" : "ghost";
+  
+  // Determine active/selected state styles manually since Shadcn variant might not cover all custom states perfectly without creating new variants
+  // But we can mix classes.
+  
+  return (
+    <ShadcnButton
+      variant={variant}
+      className={cn(
+        className,
+        selected && "bg-accent text-accent-foreground",
+        reverse && "flex-row-reverse",
+        active && "bg-accent text-accent-foreground font-bold",
+        !finalChildren && "px-2" // Icon only adjustment
+      )}
+      disabled={disabled}
+      asChild={!!(to || href)}
+      onClick={disabled ? undefined : finalOnClick}
+      {...rest}
+    >
+      {to ? (
+        <Link to={to}>
+           {finalIcon && (
+            typeof finalIcon === 'string' ? (
+              <div
+                className="w-4 h-4 bg-cover bg-center rounded-sm mr-2"
+                style={{ backgroundImage: `url(${finalIcon})` }}
+              />
+            ) : (
+              <FontAwesomeIcon
+                icon={inProgress ? faSpinner : finalIcon}
+                spin={inProgress}
+                className={cn("mr-2 h-4 w-4", reverse && "mr-0 ml-2")}
+              />
+            )
+          )}
+          {finalChildren}
+        </Link>
+      ) : href ? (
+        <a href={href} target="_blank" rel="noopener noreferrer">
+           {finalIcon && (
+            typeof finalIcon === 'string' ? (
+              <div
+                className="w-4 h-4 bg-cover bg-center rounded-sm mr-2"
+                style={{ backgroundImage: `url(${finalIcon})` }}
+              />
+            ) : (
+              <FontAwesomeIcon
+                icon={inProgress ? faSpinner : finalIcon}
+                spin={inProgress}
+                className={cn("mr-2 h-4 w-4", reverse && "mr-0 ml-2")}
+              />
+            )
+          )}
+          {finalChildren}
+        </a>
+      ) : (
+        <>
+          {finalIcon && (
+            typeof finalIcon === 'string' ? (
+              <div
+                className="w-4 h-4 bg-cover bg-center rounded-sm mr-2"
+                style={{ backgroundImage: `url(${finalIcon})` }}
+              />
+            ) : (
+              <FontAwesomeIcon
+                icon={inProgress ? faSpinner : finalIcon}
+                spin={inProgress}
+                className={cn("mr-2 h-4 w-4", reverse && "mr-0 ml-2")}
+              />
+            )
+          )}
+          {finalChildren}
+        </>
+      )}
+    </ShadcnButton>
   );
 };
 

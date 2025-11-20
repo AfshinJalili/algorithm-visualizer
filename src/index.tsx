@@ -16,6 +16,7 @@ import {
 import App from 'components/App';
 import ErrorBoundary from 'components/ErrorBoundary';
 import { store } from './store';
+import './index.css';
 import './stylesheet.scss';
 
 Chart.register(

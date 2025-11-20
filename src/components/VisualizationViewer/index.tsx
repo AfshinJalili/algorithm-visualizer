@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { classes } from 'common/util';
 import { useAppSelector, useAppDispatch } from '../../store';
 import { setLineIndicator, showErrorToast } from '../../reducers';
-import styles from './VisualizationViewer.module.scss';
+import { cn } from "@/lib/utils";
 import * as TracerClasses from 'core/tracers';
 import * as LayoutClasses from 'core/layouts';
 
@@ -125,7 +124,7 @@ const VisualizationViewer: React.FC<VisualizationViewerProps> = ({ className }) 
   }, [chunks, cursor]);
 
   return (
-    <div className={classes(styles.visualization_viewer, className)}>
+    <div className={cn("flex-1 flex items-stretch justify-stretch overflow-auto bg-background p-4", className)}>
       {rootRef.current && rootRef.current.render()}
     </div>
   );
