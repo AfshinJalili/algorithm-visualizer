@@ -7,6 +7,7 @@ class Layout {
   children: any[];
   weights: number[];
   ref: React.RefObject<any>;
+  horizontal: boolean;
 
   constructor(key: string, getObject: (key: string) => any, children: string[]) {
     this.key = key;
@@ -14,6 +15,7 @@ class Layout {
     this.children = children.map(key => this.getObject(key));
     this.weights = children.map(() => 1);
     this.ref = React.createRef();
+    this.horizontal = false;
 
     this.handleChangeWeights = this.handleChangeWeights.bind(this);
   }
@@ -44,8 +46,7 @@ class Layout {
   }
 
   render() {
-    const HorizontalLayout = require('./HorizontalLayout').default;
-    const horizontal = this instanceof HorizontalLayout;
+    const horizontal = this.horizontal;
 
     return (
       <ResizableContainer 
