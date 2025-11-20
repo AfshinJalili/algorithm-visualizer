@@ -1,9 +1,14 @@
 import React from 'react';
 import ResizableContainer from 'components/ResizableContainer';
-import { HorizontalLayout } from 'core/layouts';
 
 class Layout {
-  constructor(key, getObject, children) {
+  key: string;
+  getObject: (key: string) => any;
+  children: any[];
+  weights: number[];
+  ref: React.RefObject<any>;
+
+  constructor(key: string, getObject: (key: string) => any, children: string[]) {
     this.key = key;
     this.getObject = getObject;
     this.children = children.map(key => this.getObject(key));
@@ -13,16 +18,16 @@ class Layout {
     this.handleChangeWeights = this.handleChangeWeights.bind(this);
   }
 
-  add(key, index = this.children.length) {
+  add(key: string, index: number = this.children.length) {
     const child = this.getObject(key);
     this.children.splice(index, 0, child);
     this.weights.splice(index, 0, 1);
   }
 
-  remove(key) {
+  remove(key: string) {
     const child = this.getObject(key);
     const index = this.children.indexOf(child);
-    if (~index) {
+    if (index !== -1) {
       this.children.splice(index, 1);
       this.weights.splice(index, 1);
     }
@@ -33,20 +38,24 @@ class Layout {
     this.weights = [];
   }
 
-  handleChangeWeights(weights) {
+  handleChangeWeights(weights: number[]) {
     this.weights.splice(0, this.weights.length, ...weights);
-    this.ref.current.forceUpdate();
+    this.ref.current?.forceUpdate();
   }
 
   render() {
+    const HorizontalLayout = require('./HorizontalLayout').default;
     const horizontal = this instanceof HorizontalLayout;
 
     return (
-      <ResizableContainer key={this.key} ref={this.ref} weights={this.weights} horizontal={horizontal}
-                          onChangeWeights={this.handleChangeWeights}>
-        {
-          this.children.map(tracer => tracer && tracer.render())
-        }
+      <ResizableContainer 
+        key={this.key} 
+        ref={this.ref} 
+        weights={this.weights} 
+        horizontal={horizontal}
+        onChangeWeights={this.handleChangeWeights}
+      >
+        {this.children.map(tracer => tracer && tracer.render())}
       </ResizableContainer>
     );
   }
