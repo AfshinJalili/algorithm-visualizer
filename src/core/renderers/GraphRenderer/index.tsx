@@ -4,7 +4,10 @@ import { classes, distance } from 'common/util';
 import styles from './GraphRenderer.module.scss';
 
 class GraphRenderer extends Renderer {
-  constructor(props) {
+  elementRef: React.RefObject<SVGSVGElement>;
+  selectedNode: any;
+
+  constructor(props: any) {
     super(props);
 
     this.elementRef = React.createRef();
@@ -14,32 +17,32 @@ class GraphRenderer extends Renderer {
     this.toggleZoom(true);
   }
 
-  handleMouseDown(e) {
-    super.handleMouseDown(e);
+  handleMouseDown(e: React.MouseEvent) {
+    super.handleMouseDown && super.handleMouseDown(e);
     const coords = this.computeCoords(e);
     const { nodes, dimensions } = this.props.data;
     const { nodeRadius } = dimensions;
-    this.selectedNode = nodes.find(node => distance(coords, node) <= nodeRadius);
+    this.selectedNode = nodes.find((node: any) => distance(coords, node) <= nodeRadius);
   }
 
-  handleMouseMove(e) {
+  handleMouseMove(e: MouseEvent) {
     if (this.selectedNode) {
-      const { x, y } = this.computeCoords(e);
+      const { x, y } = this.computeCoords(e as any);
       const node = this.props.data.findNode(this.selectedNode.id);
       node.x = x;
       node.y = y;
       this.refresh();
     } else {
-      super.handleMouseMove(e);
+      super.handleMouseMove && super.handleMouseMove(e);
     }
   }
 
-  computeCoords(e) {
-    const svg = this.elementRef.current;
+  computeCoords(e: any): { x: number; y: number } {
+    const svg = this.elementRef.current!;
     const s = svg.createSVGPoint();
     s.x = e.clientX;
     s.y = e.clientY;
-    const { x, y } = s.matrixTransform(svg.getScreenCTM().inverse());
+    const { x, y } = s.matrixTransform(svg.getScreenCTM()!.inverse());
     return { x, y };
   }
 
@@ -53,7 +56,7 @@ class GraphRenderer extends Renderer {
       baseHeight * this.zoom,
     ];
     return (
-      <svg className={styles.graph} viewBox={viewBox} ref={this.elementRef}>
+      <svg className={styles.graph} viewBox={viewBox.join(' ')} ref={this.elementRef}>
         <defs>
           <marker id="markerArrow" markerWidth="4" markerHeight="4" refX="2" refY="2" orient="auto">
             <path d="M0,0 L0,4 L4,2 L0,0" className={styles.arrow} />
@@ -66,7 +69,7 @@ class GraphRenderer extends Renderer {
           </marker>
         </defs>
         {
-          edges.sort((a, b) => a.visitedCount - b.visitedCount).map(edge => {
+          edges.sort((a: any, b: any) => a.visitedCount - b.visitedCount).map((edge: any) => {
             const { source, target, weight, visitedCount, selectedCount } = edge;
             const sourceNode = this.props.data.findNode(source);
             const targetNode = this.props.data.findNode(target);
@@ -102,7 +105,7 @@ class GraphRenderer extends Renderer {
           })
         }
         {
-          nodes.map(node => {
+          nodes.map((node: any) => {
             const { id, x, y, weight, visitedCount, selectedCount } = node;
             return (
               <g className={classes(styles.node, selectedCount && styles.selected, visitedCount && styles.visited)}

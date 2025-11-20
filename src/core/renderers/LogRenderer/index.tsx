@@ -3,15 +3,17 @@ import { Renderer } from 'core/renderers';
 import styles from './LogRenderer.module.scss';
 
 class LogRenderer extends Renderer {
-  constructor(props) {
+  elementRef: React.RefObject<HTMLDivElement>;
+
+  constructor(props: any) {
     super(props);
 
     this.elementRef = React.createRef();
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps: any, prevState: any, snapshot: any) {
     super.componentDidUpdate(prevProps, prevState, snapshot);
-    const div = this.elementRef.current;
+    const div = this.elementRef.current!;
     div.scrollTop = div.scrollHeight;
   }
 

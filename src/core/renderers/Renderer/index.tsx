@@ -3,17 +3,36 @@ import styles from './Renderer.module.scss';
 import Ellipsis from 'components/Ellipsis';
 import { classes } from 'common/util';
 
-class Renderer extends React.Component {
-  constructor(props) {
+interface RendererProps {
+  className?: string;
+  title: string;
+  data: any;
+}
+
+class Renderer extends React.Component<RendererProps> {
+  _handleMouseDown: ((e: React.MouseEvent) => void) | undefined;
+  _handleWheel: ((e: React.WheelEvent) => void) | undefined;
+  handleMouseDown: ((e: React.MouseEvent) => void) | undefined;
+  handleWheel: ((e: React.WheelEvent) => void) | undefined;
+  handleMouseMove: (e: MouseEvent) => void;
+  handleMouseUp: (e: MouseEvent) => void;
+  lastX: number | null;
+  lastY: number | null;
+  centerX: number;
+  centerY: number;
+  zoom: number;
+  zoomFactor: number;
+  zoomMax: number;
+  zoomMin: number;
+
+  constructor(props: RendererProps) {
     super(props);
 
-    this.handleMouseDown = this.handleMouseDown.bind(this);
-    this.handleMouseMove = this.handleMouseMove.bind(this);
-    this.handleMouseUp = this.handleMouseUp.bind(this);
-    this.handleWheel = this.handleWheel.bind(this);
+    this.handleMouseMove = this._handleMouseMove.bind(this);
+    this.handleMouseUp = this._handleMouseUp.bind(this);
 
-    this._handleMouseDown = this.handleMouseDown;
-    this._handleWheel = this.handleWheel;
+    this._handleMouseDown = this._internalHandleMouseDown.bind(this);
+    this._handleWheel = this._internalHandleWheel.bind(this);
     this.togglePan(false);
     this.toggleZoom(false);
 
@@ -27,18 +46,18 @@ class Renderer extends React.Component {
     this.zoomMin = 1 / 20;
   }
 
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps: RendererProps, prevState: any, snapshot: any) {
   }
 
-  togglePan(enable = !this.handleMouseDown) {
+  togglePan(enable: boolean = !this.handleMouseDown) {
     this.handleMouseDown = enable ? this._handleMouseDown : undefined;
   }
 
-  toggleZoom(enable = !this.handleWheel) {
+  toggleZoom(enable: boolean = !this.handleWheel) {
     this.handleWheel = enable ? this._handleWheel : undefined;
   }
 
-  handleMouseDown(e) {
+  _internalHandleMouseDown(e: React.MouseEvent) {
     const { clientX, clientY } = e;
     this.lastX = clientX;
     this.lastY = clientY;
@@ -46,10 +65,10 @@ class Renderer extends React.Component {
     document.addEventListener('mouseup', this.handleMouseUp);
   }
 
-  handleMouseMove(e) {
+  _handleMouseMove(e: MouseEvent) {
     const { clientX, clientY } = e;
-    const dx = clientX - this.lastX;
-    const dy = clientY - this.lastY;
+    const dx = clientX - this.lastX!;
+    const dy = clientY - this.lastY!;
     this.centerX -= dx;
     this.centerY -= dy;
     this.refresh();
@@ -57,12 +76,12 @@ class Renderer extends React.Component {
     this.lastY = clientY;
   }
 
-  handleMouseUp(e) {
+  _handleMouseUp(e: MouseEvent) {
     document.removeEventListener('mousemove', this.handleMouseMove);
     document.removeEventListener('mouseup', this.handleMouseUp);
   }
 
-  handleWheel(e) {
+  _internalHandleWheel(e: React.WheelEvent) {
     e.preventDefault();
     const { deltaY } = e;
     this.zoom *= Math.pow(this.zoomFactor, deltaY);
@@ -70,7 +89,7 @@ class Renderer extends React.Component {
     this.refresh();
   }
 
-  toString(value) {
+  toString(value: any): string {
     switch (typeof(value)) {
       case 'number':
         return [Number.POSITIVE_INFINITY, Number.MAX_SAFE_INTEGER, 0x7fffffff].includes(value) ? '∞' :
@@ -88,7 +107,7 @@ class Renderer extends React.Component {
     this.forceUpdate();
   }
 
-  renderData() {
+  renderData(): React.ReactNode {
     return null;
   }
 

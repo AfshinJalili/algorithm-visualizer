@@ -4,7 +4,7 @@ import styles from './Array2DRenderer.module.scss';
 import { classes } from 'common/util';
 
 class Array2DRenderer extends Renderer {
-  constructor(props) {
+  constructor(props: any) {
     super(props);
 
     this.togglePan(true);
@@ -15,7 +15,7 @@ class Array2DRenderer extends Renderer {
     const { data } = this.props.data;
 
     const isArray1D = this instanceof Array1DRenderer;
-    let longestRow = data.reduce((longestRow, row) => longestRow.length < row.length ? row : longestRow, []);
+    let longestRow = data.reduce((longestRow: any[], row: any[]) => longestRow.length < row.length ? row : longestRow, []);
 
     return (
       <table className={styles.array_2d}
@@ -27,7 +27,7 @@ class Array2DRenderer extends Renderer {
             <td className={classes(styles.col, styles.index)} />
           }
           {
-            longestRow.map((_, i) => (
+            longestRow.map((_: any, i: number) => (
               <td className={classes(styles.col, styles.index)} key={i}>
                 <span className={styles.value}>{i}</span>
               </td>
@@ -35,7 +35,7 @@ class Array2DRenderer extends Renderer {
           }
         </tr>
         {
-          data.map((row, i) => (
+          data.map((row: any[], i: number) => (
             <tr className={styles.row} key={i}>
               {
                 !isArray1D &&
@@ -44,7 +44,7 @@ class Array2DRenderer extends Renderer {
                 </td>
               }
               {
-                row.map((col, j) => (
+                row.map((col: any, j: number) => (
                   <td className={classes(styles.col, col.selected && styles.selected, col.patched && styles.patched)}
                       key={j}>
                     <span className={styles.value}>{this.toString(col.value)}</span>

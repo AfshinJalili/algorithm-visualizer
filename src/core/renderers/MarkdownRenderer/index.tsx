@@ -7,19 +7,19 @@ class MarkdownRenderer extends Renderer {
   renderData() {
     const { markdown } = this.props.data;
 
-    const heading = ({ level, children, ...rest }) => {
+    const heading = ({ level, children, ...rest }: any) => {
       const HeadingComponent = [
-        props => <h1 {...props} />,
-        props => <h2 {...props} />,
-        props => <h3 {...props} />,
-        props => <h4 {...props} />,
-        props => <h5 {...props} />,
-        props => <h6 {...props} />,
+        (props: any) => <h1 {...props} />,
+        (props: any) => <h2 {...props} />,
+        (props: any) => <h3 {...props} />,
+        (props: any) => <h4 {...props} />,
+        (props: any) => <h5 {...props} />,
+        (props: any) => <h6 {...props} />,
       ][level - 1];
 
-      const idfy = text => text.toLowerCase().trim().replace(/[^\w \-]/g, '').replace(/ /g, '-');
+      const idfy = (text: string) => text.toLowerCase().trim().replace(/[^\w \-]/g, '').replace(/ /g, '-');
 
-      const getText = children => {
+      const getText = (children: any): string => {
         return React.Children.map(children, child => {
           if (!child) return '';
           if (typeof child === 'string') return child;
@@ -37,7 +37,7 @@ class MarkdownRenderer extends Renderer {
       );
     };
 
-    const link = ({ href, ...rest }) => {
+    const link = ({ href, ...rest }: any) => {
       return /^#/.test(href) ? (
         <a href={href} {...rest} />
       ) : (
@@ -45,9 +45,9 @@ class MarkdownRenderer extends Renderer {
       );
     };
 
-    const image = ({ src, ...rest }) => {
+    const image = ({ src, ...rest }: any) => {
       let newSrc = src;
-      let style = { maxWidth: '100%' };
+      let style: React.CSSProperties = { maxWidth: '100%' };
       const CODECOGS = 'https://latex.codecogs.com/svg.latex?';
       const WIKIMEDIA_IMAGE = 'https://upload.wikimedia.org/wikipedia/';
       const WIKIMEDIA_MATH = 'https://wikimedia.org/api/rest_v1/media/math/render/svg/';
