@@ -156,7 +156,7 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
     return true;
   }, [cursor, isValidCursor, pause, dispatch]);
 
-  const play = useCallback(() => {
+  const play = useCallback((): void => {
     if (cursor >= chunks.length) {
       dispatch(setCursor(1));
     }

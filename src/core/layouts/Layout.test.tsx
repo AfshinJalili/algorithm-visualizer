@@ -5,7 +5,10 @@ import VerticalLayout from './VerticalLayout';
 
 describe('Layout', () => {
   it('should instantiate correctly', () => {
-    const mockGetObject = (key: string) => ({ key, render: () => null });
+    const mockGetObject = (key: string): { key: string; render: () => null } => ({
+      key,
+      render: () => null,
+    });
     const layout = new Layout('test', mockGetObject, ['child1', 'child2']);
     expect(layout.key).toBe('test');
     expect(layout.children.length).toBe(2);
@@ -13,7 +16,10 @@ describe('Layout', () => {
   });
 
   it('should add children', () => {
-    const mockGetObject = (key: string) => ({ key, render: () => null });
+    const mockGetObject = (key: string): { key: string; render: () => null } => ({
+      key,
+      render: () => null,
+    });
     const layout = new Layout('test', mockGetObject, []);
     layout.add('child1');
     expect(layout.children.length).toBe(1);
@@ -21,11 +27,11 @@ describe('Layout', () => {
   });
 
   it('should remove children', () => {
-    const children: Record<string, any> = {
+    const children: Record<string, { key: string; render: () => null }> = {
       child1: { key: 'child1', render: () => null },
       child2: { key: 'child2', render: () => null },
     };
-    const mockGetObject = (key: string) => children[key];
+    const mockGetObject = (key: string): { key: string; render: () => null } => children[key];
     const layout = new Layout('test', mockGetObject, ['child1', 'child2']);
     layout.remove('child1');
     expect(layout.children.length).toBe(1);
@@ -34,7 +40,10 @@ describe('Layout', () => {
 
 describe('HorizontalLayout', () => {
   it('should extend Layout', () => {
-    const mockGetObject = (key: string) => ({ key, render: () => null });
+    const mockGetObject = (key: string): { key: string; render: () => null } => ({
+      key,
+      render: () => null,
+    });
     const layout = new HorizontalLayout('test', mockGetObject, []);
     expect(layout).toBeInstanceOf(Layout);
   });
@@ -42,7 +51,10 @@ describe('HorizontalLayout', () => {
 
 describe('VerticalLayout', () => {
   it('should extend Layout', () => {
-    const mockGetObject = (key: string) => ({ key, render: () => null });
+    const mockGetObject = (key: string): { key: string; render: () => null } => ({
+      key,
+      render: () => null,
+    });
     const layout = new VerticalLayout('test', mockGetObject, []);
     expect(layout).toBeInstanceOf(Layout);
   });
