@@ -5,6 +5,7 @@ import { Helmet } from 'react-helmet';
 import queryString from 'query-string';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import CodeEditor from 'components/CodeEditor';
+import ErrorBoundary from 'components/ErrorBoundary';
 import Header from 'components/Header';
 import Navigator from 'components/Navigator';
 import ResizableContainer from 'components/ResizableContainer';
@@ -259,11 +260,21 @@ const App: React.FC = () => {
         visibles={workspaceVisibles} 
         onChangeWeights={handleChangeWorkspaceWeights}
       >
-        <Navigator/>
-        <VisualizationViewer className={styles.visualization_viewer}/>
-        <TabContainer className={styles.editor_tab_container}>
-          <CodeEditor ref={codeEditorRef}/>
-        </TabContainer>
+        <ErrorBoundary level="component">
+          <Navigator/>
+        </ErrorBoundary>
+        <ErrorBoundary 
+          level="feature"
+          resetKeys={[params.algorithmKey, params.gistId]}
+          onError={(error) => dispatch(showErrorToast(error.message))}
+        >
+          <VisualizationViewer className={styles.visualization_viewer}/>
+        </ErrorBoundary>
+        <ErrorBoundary level="component">
+          <TabContainer className={styles.editor_tab_container}>
+            <CodeEditor ref={codeEditorRef}/>
+          </TabContainer>
+        </ErrorBoundary>
       </ResizableContainer>
       <ToastContainer className={styles.toast_container}/>
     </div>

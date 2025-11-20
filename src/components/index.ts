@@ -3,6 +3,7 @@ export { default as Button } from './Button';
 export { default as CodeEditor } from './CodeEditor';
 export { default as Divider } from './Divider';
 export { default as Ellipsis } from './Ellipsis';
+export { default as ErrorBoundary } from './ErrorBoundary';
 export { default as ExpandableListItem } from './ExpandableListItem';
 export { default as FoldableAceEditor } from './FoldableAceEditor';
 export { default as Header } from './Header';

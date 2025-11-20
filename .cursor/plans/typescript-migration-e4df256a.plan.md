@@ -151,10 +151,10 @@ export const store = createStore(combineReducers(reducers));
 
 ### To-dos
 
-- [ ] Install Vitest + React Testing Library and create test configuration
-- [ ] Migrate 7 core tracer files with unit tests
-- [ ] Migrate 8 renderer components with tests
-- [ ] Migrate 3 layout components with tests
-- [ ] Migrate common/config, components index, files module
-- [ ] Run full test suite, build, and browser smoke test
-- [ ] Delete duplicate .js/.jsx files and commit
+- [x] Install Vitest + React Testing Library and create test configuration
+- [x] Migrate 7 core tracer files with unit tests
+- [x] Migrate 8 renderer components with tests
+- [x] Migrate 3 layout components with tests
+- [x] Migrate common/config, components index, files module
+- [x] Run full test suite, build, and browser smoke test
+- [x] Delete duplicate .js/.jsx files and commit
