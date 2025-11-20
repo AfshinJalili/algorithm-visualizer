@@ -5,34 +5,46 @@ import styles from './ChartRenderer.module.scss';
 
 class ChartRenderer extends Array1DRenderer {
   renderData() {
-    const { data: [row] } = this.props.data;
+    const {
+      data: [row],
+    } = this.props.data;
 
     const chartData = {
       labels: row.map((col: any) => `${col.value}`),
-      datasets: [{
-        backgroundColor: row.map((col: any) => col.patched ? styles.colorPatched : col.selected ? styles.colorSelected : styles.colorFont),
-        data: row.map((col: any) => col.value),
-      }],
+      datasets: [
+        {
+          backgroundColor: row.map((col: any) =>
+            col.patched
+              ? styles.colorPatched
+              : col.selected
+                ? styles.colorSelected
+                : styles.colorFont
+          ),
+          data: row.map((col: any) => col.value),
+        },
+      ],
     };
     return (
-      <Bar data={chartData} options={{
-        scales: {
-          y: {
-            beginAtZero: true
-          }
-        },
-        animation: false,
-        plugins: {
-          legend: {
-            display: false
-          }
-        },
-        responsive: true,
-        maintainAspectRatio: false
-      }} />
+      <Bar
+        data={chartData}
+        options={{
+          scales: {
+            y: {
+              beginAtZero: true,
+            },
+          },
+          animation: false,
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
+          responsive: true,
+          maintainAspectRatio: false,
+        }}
+      />
     );
   }
 }
 
 export default ChartRenderer;
-

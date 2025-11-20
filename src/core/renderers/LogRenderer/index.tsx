@@ -29,4 +29,3 @@ class LogRenderer extends Renderer {
 }
 
 export default LogRenderer;
-

@@ -8,11 +8,7 @@ interface EllipsisProps {
 }
 
 const Ellipsis: React.FC<EllipsisProps> = ({ className, children }) => {
-  return (
-    <span className={classes(styles.ellipsis, className)}>
-      {children}
-    </span>
-  );
+  return <span className={classes(styles.ellipsis, className)}>{children}</span>;
 };
 
 export default Ellipsis;

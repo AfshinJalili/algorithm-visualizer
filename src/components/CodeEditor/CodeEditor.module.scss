@@ -1,4 +1,4 @@
-@import "common/stylesheet/index";
+@import 'common/stylesheet/index';
 
 .code_editor {
   flex: 1;
@@ -19,7 +19,7 @@
       position: absolute;
       width: 100% !important;
 
-      animation: line_highlight .1s;
+      animation: line_highlight 0.1s;
     }
 
     @keyframes line_highlight {

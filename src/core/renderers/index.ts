@@ -6,4 +6,3 @@ export { default as Array1DRenderer } from './Array1DRenderer';
 export { default as ChartRenderer } from './ChartRenderer';
 export { default as GraphRenderer } from './GraphRenderer';
 export { default as ScatterRenderer } from './ScatterRenderer';
-

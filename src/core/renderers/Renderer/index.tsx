@@ -46,8 +46,7 @@ class Renderer extends React.Component<RendererProps> {
     this.zoomMin = 1 / 20;
   }
 
-  componentDidUpdate(prevProps: RendererProps, prevState: any, snapshot: any) {
-  }
+  componentDidUpdate(prevProps: RendererProps, prevState: any, snapshot: any) {}
 
   togglePan(enable: boolean = !this.handleMouseDown) {
     this.handleMouseDown = enable ? this._handleMouseDown : undefined;
@@ -90,12 +89,15 @@ class Renderer extends React.Component<RendererProps> {
   }
 
   toString(value: any): string {
-    switch (typeof(value)) {
+    switch (typeof value) {
       case 'number':
-        return [Number.POSITIVE_INFINITY, Number.MAX_SAFE_INTEGER, 0x7fffffff].includes(value) ? '∞' :
-          [Number.NEGATIVE_INFINITY, Number.MIN_SAFE_INTEGER, -0x80000000].includes(value) ? '-∞' :
-            Number.isInteger(value) ? value.toString() :
-              value.toFixed(3);
+        return [Number.POSITIVE_INFINITY, Number.MAX_SAFE_INTEGER, 0x7fffffff].includes(value)
+          ? '∞'
+          : [Number.NEGATIVE_INFINITY, Number.MIN_SAFE_INTEGER, -0x80000000].includes(value)
+            ? '-∞'
+            : Number.isInteger(value)
+              ? value.toString()
+              : value.toFixed(3);
       case 'boolean':
         return value ? 'T' : 'F';
       default:
@@ -115,16 +117,16 @@ class Renderer extends React.Component<RendererProps> {
     const { className, title } = this.props;
 
     return (
-      <div className={classes(styles.renderer, className)} onMouseDown={this.handleMouseDown}
-           onWheel={this.handleWheel}>
+      <div
+        className={classes(styles.renderer, className)}
+        onMouseDown={this.handleMouseDown}
+        onWheel={this.handleWheel}
+      >
         <Ellipsis className={styles.title}>{title}</Ellipsis>
-        {
-          this.renderData()
-        }
+        {this.renderData()}
       </div>
     );
   }
 }
 
 export default Renderer;
-

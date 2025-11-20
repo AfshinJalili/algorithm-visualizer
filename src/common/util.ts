@@ -1,6 +1,6 @@
 import { File } from '../types';
 
-export const classes = (...arr: (string | boolean | undefined | null)[]): string => 
+export const classes = (...arr: (string | boolean | undefined | null)[]): string =>
   arr.filter(v => v).join(' ');
 
 export const distance = (a: { x: number; y: number }, b: { x: number; y: number }): number => {
@@ -9,7 +9,7 @@ export const distance = (a: { x: number; y: number }, b: { x: number; y: number 
   return Math.sqrt(dx * dx + dy * dy);
 };
 
-export const extension = (fileName: string): string | undefined => 
+export const extension = (fileName: string): string | undefined =>
   /(?:\.([^.]+))?$/.exec(fileName)?.[1];
 
 interface Contributor {
@@ -42,27 +42,35 @@ export const refineGist = (gist: Gist) => {
   return { login, gistId, title, files };
 };
 
-export const createFile = (name: string, content: string, contributors?: Contributor[]): File => 
-  ({ name, content, contributors } as File);
+export const createFile = (name: string, content: string, contributors?: Contributor[]): File =>
+  ({ name, content, contributors }) as File;
 
-export const createProjectFile = (name: string, content: string): File => 
-  createFile(name, content, [{
-    login: 'algorithm-visualizer',
-    avatar_url: 'https://github.com/algorithm-visualizer.png',
-  }]);
+export const createProjectFile = (name: string, content: string): File =>
+  createFile(name, content, [
+    {
+      login: 'algorithm-visualizer',
+      avatar_url: 'https://github.com/algorithm-visualizer.png',
+    },
+  ]);
 
-export const createUserFile = (name: string, content: string): File => 
+export const createUserFile = (name: string, content: string): File =>
   createFile(name, content, undefined);
 
-export const isSaved = ({ titles, files, lastTitles, lastFiles }: { 
-  titles: string[]; 
-  files: File[]; 
-  lastTitles: string[]; 
-  lastFiles: File[] 
+export const isSaved = ({
+  titles,
+  files,
+  lastTitles,
+  lastFiles,
+}: {
+  titles: string[];
+  files: File[];
+  lastTitles: string[];
+  lastFiles: File[];
 }): boolean => {
-  const serialize = (titles: string[], files: File[]) => JSON.stringify({
-    titles,
-    files: files.map(({ name, content }) => ({ name, content })),
-  });
+  const serialize = (titles: string[], files: File[]) =>
+    JSON.stringify({
+      titles,
+      files: files.map(({ name, content }) => ({ name, content })),
+    });
   return serialize(titles, files) === serialize(lastTitles, lastFiles);
 };

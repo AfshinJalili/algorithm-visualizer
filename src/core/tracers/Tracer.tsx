@@ -18,18 +18,14 @@ class Tracer {
     return Renderer;
   }
 
-  init() {
-  }
+  init() {}
 
   render() {
     const RendererClass = this.getRendererClass();
-    return (
-      <RendererClass key={this.key} title={this.title} data={this} />
-    );
+    return <RendererClass key={this.key} title={this.title} data={this} />;
   }
 
-  set() {
-  }
+  set() {}
 
   reset() {
     this.set();

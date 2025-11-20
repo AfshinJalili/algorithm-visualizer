@@ -17,7 +17,12 @@ class MarkdownRenderer extends Renderer {
         (props: any) => <h6 {...props} />,
       ][level - 1];
 
-      const idfy = (text: string) => text.toLowerCase().trim().replace(/[^\w \-]/g, '').replace(/ /g, '-');
+      const idfy = (text: string) =>
+        text
+          .toLowerCase()
+          .trim()
+          .replace(/[^\w \-]/g, '')
+          .replace(/ /g, '-');
 
       const getText = (children: any): string => {
         return React.Children.map(children, child => {
@@ -47,7 +52,7 @@ class MarkdownRenderer extends Renderer {
 
     const image = ({ src, ...rest }: any) => {
       let newSrc = src;
-      let style: React.CSSProperties = { maxWidth: '100%' };
+      const style: React.CSSProperties = { maxWidth: '100%' };
       const CODECOGS = 'https://latex.codecogs.com/svg.latex?';
       const WIKIMEDIA_IMAGE = 'https://upload.wikimedia.org/wikipedia/';
       const WIKIMEDIA_MATH = 'https://wikimedia.org/api/rest_v1/media/math/render/svg/';
@@ -73,4 +78,3 @@ class MarkdownRenderer extends Renderer {
 }
 
 export default MarkdownRenderer;
-

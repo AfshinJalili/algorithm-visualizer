@@ -8,4 +8,3 @@ class ScatterTracer extends Array2DTracer {
 }
 
 export default ScatterTracer;
-

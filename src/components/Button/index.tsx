@@ -100,8 +100,8 @@ const Button: React.FC<ButtonProps> = ({
     href: disabled ? null : finalHref,
     onClick: disabled ? null : finalOnClick,
     children: [
-      finalIcon && (
-        typeof finalIcon === 'string' ? (
+      finalIcon &&
+        (typeof finalIcon === 'string' ? (
           <div
             className={classes(styles.icon, styles.image)}
             key="icon"
@@ -115,8 +115,7 @@ const Button: React.FC<ButtonProps> = ({
             spin={inProgress}
             key="icon"
           />
-        )
-      ),
+        )),
       finalChildren,
     ],
     ...rest,

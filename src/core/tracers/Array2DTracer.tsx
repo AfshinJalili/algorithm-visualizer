@@ -69,4 +69,3 @@ class Array2DTracer extends Tracer {
 }
 
 export default Array2DTracer;
-

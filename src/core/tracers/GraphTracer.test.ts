@@ -26,4 +26,3 @@ describe('GraphTracer', () => {
     expect(tracer.findEdge(0, 1)).toBeDefined();
   });
 });
-

@@ -15,4 +15,3 @@ class MarkdownTracer extends Tracer {
 }
 
 export default MarkdownTracer;
-

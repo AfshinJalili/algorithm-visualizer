@@ -47,4 +47,3 @@ describe('VerticalLayout', () => {
     expect(layout).toBeInstanceOf(Layout);
   });
 });
-

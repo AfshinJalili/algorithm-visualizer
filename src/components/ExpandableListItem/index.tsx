@@ -12,7 +12,12 @@ interface ExpandableListItemProps {
   [key: string]: any;
 }
 
-const ExpandableListItem: React.FC<ExpandableListItemProps> = ({ className, children, opened, ...props }) => {
+const ExpandableListItem: React.FC<ExpandableListItemProps> = ({
+  className,
+  children,
+  opened,
+  ...props
+}) => {
   return opened ? (
     <div className={classes(styles.expandable_list_item, className)}>
       <ListItem className={styles.category} {...props}>

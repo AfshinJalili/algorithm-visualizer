@@ -14,7 +14,7 @@ export const store = configureStore({
     player: playerReducer,
     toast: toastReducer,
   },
-  middleware: (getDefaultMiddleware) =>
+  middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       serializableCheck: {
         // Ignore these paths in serialization check

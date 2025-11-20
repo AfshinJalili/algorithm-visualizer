@@ -9,7 +9,12 @@ interface ProgressBarProps {
   onChangeProgress?: (progress: number) => void;
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({ className, total, current, onChangeProgress }) => {
+const ProgressBar: React.FC<ProgressBarProps> = ({
+  className,
+  total,
+  current,
+  onChangeProgress,
+}) => {
   const targetRef = useRef<HTMLDivElement | null>(null);
 
   const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -34,7 +39,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ className, total, current, on
 
   return (
     <div className={classes(styles.progress_bar, className)} onMouseDown={handleMouseDown}>
-      <div className={styles.active} style={{ width: `${current / total * 100}%` }} />
+      <div className={styles.active} style={{ width: `${(current / total) * 100}%` }} />
       <div className={styles.label}>
         <span className={styles.current}>{current}</span> / {total}
       </div>

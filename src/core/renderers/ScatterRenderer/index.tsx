@@ -9,44 +9,47 @@ class ScatterRenderer extends Array2DRenderer {
   renderData() {
     const { data } = this.props.data;
 
-    const datasets = data.map((series: any[], index: number) => (
-      {
-        backgroundColor: colors[index],
-        data: series.map(s => convertToObjectArray(s.value)),
-        label: Math.random(),
-        radius: (index + 1) * 2,
-      }));
+    const datasets = data.map((series: any[], index: number) => ({
+      backgroundColor: colors[index],
+      data: series.map(s => convertToObjectArray(s.value)),
+      label: Math.random(),
+      radius: (index + 1) * 2,
+    }));
 
     const chartData = {
       datasets,
     };
 
-    return <Scatter data={chartData} options={{
-      plugins: {
-        legend: {
-          display: false
-        }
-      },
-      animation: false,
-      layout: {
-        padding: {
-          left: 20,
-          right: 20,
-          top: 20,
-          bottom: 20,
-        },
-      },
-      scales: {
-        y: {
-          beginAtZero: false,
-        },
-        x: {
-          beginAtZero: false,
-        },
-      },
-    }} />;
+    return (
+      <Scatter
+        data={chartData}
+        options={{
+          plugins: {
+            legend: {
+              display: false,
+            },
+          },
+          animation: false,
+          layout: {
+            padding: {
+              left: 20,
+              right: 20,
+              top: 20,
+              bottom: 20,
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+            },
+            x: {
+              beginAtZero: false,
+            },
+          },
+        }}
+      />
+    );
   }
 }
 
 export default ScatterRenderer;
-

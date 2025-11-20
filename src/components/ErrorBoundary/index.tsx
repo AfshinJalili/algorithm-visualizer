@@ -60,7 +60,7 @@ class ErrorBoundary extends Component<Props, State> {
               {level === 'root' ? 'Application Error' : 'Something went wrong'}
             </h2>
             <p className={styles.message}>
-              {level === 'root' 
+              {level === 'root'
                 ? 'The application encountered an unexpected error.'
                 : 'This component failed to render.'}
             </p>
@@ -78,8 +78,8 @@ class ErrorBoundary extends Component<Props, State> {
                 Try Again
               </button>
               {level === 'root' && (
-                <button 
-                  onClick={() => window.location.href = '/'} 
+                <button
+                  onClick={() => (window.location.href = '/')}
                   className={styles.secondaryButton}
                 >
                   Go Home
@@ -96,4 +96,3 @@ class ErrorBoundary extends Component<Props, State> {
 }
 
 export default ErrorBoundary;
-

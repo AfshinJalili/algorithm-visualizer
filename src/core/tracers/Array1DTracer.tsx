@@ -46,4 +46,3 @@ class Array1DTracer extends Array2DTracer {
 }
 
 export default Array1DTracer;
-

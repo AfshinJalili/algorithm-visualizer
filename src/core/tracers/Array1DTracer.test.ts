@@ -34,4 +34,3 @@ describe('Array1DTracer', () => {
     expect(tracer.data[0][2].selected).toBe(true);
   });
 });
-

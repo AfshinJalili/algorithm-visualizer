@@ -29,4 +29,3 @@ describe('LogTracer', () => {
     expect(tracer.log).toBe('Line 1\nLine 2\n');
   });
 });
-

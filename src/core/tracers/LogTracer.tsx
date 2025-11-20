@@ -28,4 +28,3 @@ class LogTracer extends Tracer {
 }
 
 export default LogTracer;
-

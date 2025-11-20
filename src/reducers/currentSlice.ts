@@ -5,7 +5,8 @@ import { CurrentState, File } from '../types';
 
 const homeTitles = ['Algorithm Visualizer'];
 const homeFiles = [ROOT_README_MD];
-const homeDescription = 'Algorithm Visualizer is an interactive online platform that visualizes algorithms from code.';
+const homeDescription =
+  'Algorithm Visualizer is an interactive online platform that visualizes algorithms from code.';
 
 const initialState: CurrentState = {
   algorithm: {
@@ -28,15 +29,19 @@ const currentSlice = createSlice({
   initialState,
   reducers: {
     setHome: () => initialState,
-    setAlgorithm: (state, action: PayloadAction<{
-      categoryKey: string;
-      categoryName: string;
-      algorithmKey: string;
-      algorithmName: string;
-      files: File[];
-      description: string;
-    }>) => {
-      const { categoryKey, categoryName, algorithmKey, algorithmName, files, description } = action.payload;
+    setAlgorithm: (
+      state,
+      action: PayloadAction<{
+        categoryKey: string;
+        categoryName: string;
+        algorithmKey: string;
+        algorithmName: string;
+        files: File[];
+        description: string;
+      }>
+    ) => {
+      const { categoryKey, categoryName, algorithmKey, algorithmName, files, description } =
+        action.payload;
       state.algorithm = { categoryKey, algorithmKey };
       state.scratchPaper = undefined;
       state.titles = [categoryName, algorithmName];
@@ -48,12 +53,15 @@ const currentSlice = createSlice({
       state.shouldBuild = true;
       state.saved = true;
     },
-    setScratchPaper: (state, action: PayloadAction<{
-      login: string;
-      gistId: string;
-      title: string;
-      files: File[];
-    }>) => {
+    setScratchPaper: (
+      state,
+      action: PayloadAction<{
+        login: string;
+        gistId: string;
+        title: string;
+        files: File[];
+      }>
+    ) => {
       const { login, gistId, title, files } = action.payload;
       state.algorithm = { categoryKey: '', algorithmKey: '' };
       state.scratchPaper = { login, gistId };

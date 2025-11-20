@@ -1,0 +1,9 @@
+dist
+build
+node_modules
+coverage
+*.config.js
+*.config.ts
+public
+vite-env.d.ts
+

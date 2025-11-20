@@ -7,7 +7,8 @@ const request = (url: string, process: (mappedURL: string, args: any[]) => Promi
   const tokens = url.split('/');
   const baseURL = /^https?:\/\//i.test(url) ? '' : '/api';
   return (...args: any[]) => {
-    const mappedURL = baseURL + tokens.map(token => token.startsWith(':') ? args.shift() : token).join('/');
+    const mappedURL =
+      baseURL + tokens.map(token => (token.startsWith(':') ? args.shift() : token)).join('/');
     return Promise.resolve(process(mappedURL, args));
   };
 };
@@ -57,7 +58,8 @@ export const VisualizationApi = {
 };
 
 export const GitHubApi = {
-  auth: (token?: string) => Promise.resolve(axios.defaults.headers.common['Authorization'] = token && `token ${token}`),
+  auth: (token?: string) =>
+    Promise.resolve((axios.defaults.headers.common['Authorization'] = token && `token ${token}`)),
   getUser: GET('https://api.github.com/user'),
   listGists: GET('https://api.github.com/gists'),
   createGist: POST('https://api.github.com/gists'),
@@ -68,26 +70,32 @@ export const GitHubApi = {
 };
 
 export const TracerApi = {
-  md: ({ code }: { code: string }) => Promise.resolve([{
-    key: 'markdown',
-    method: 'MarkdownTracer',
-    args: ['Markdown'],
-  }, {
-    key: 'markdown',
-    method: 'set',
-    args: [code],
-  }, {
-    key: null,
-    method: 'setRoot',
-    args: ['markdown'],
-  }]),
+  md: ({ code }: { code: string }) =>
+    Promise.resolve([
+      {
+        key: 'markdown',
+        method: 'MarkdownTracer',
+        args: ['Markdown'],
+      },
+      {
+        key: 'markdown',
+        method: 'set',
+        args: [code],
+      },
+      {
+        key: null,
+        method: 'setRoot',
+        args: ['markdown'],
+      },
+    ]),
   json: ({ code }: { code: string }) => new Promise(resolve => resolve(JSON.parse(code))),
-  js: ({ code }: { code: string }, params?: any, cancelToken?: CancelToken) => new Promise(async (resolve, reject) => {
-    try {
-      const libResponse = await fetch('/api/tracers/js');
-      const libText = await libResponse.text();
-      
-      const workerCode = `
+  js: ({ code }: { code: string }, params?: any, cancelToken?: CancelToken) =>
+    new Promise(async (resolve, reject) => {
+      try {
+        const libResponse = await fetch('/api/tracers/js');
+        const libText = await libResponse.text();
+
+        const workerCode = `
 const process = { env: { ALGORITHM_VISUALIZER: '1' } };
 ${libText}
 
@@ -103,33 +111,33 @@ onmessage = e => {
   postMessage(AlgorithmVisualizer.Commander.commands);
 };
 `;
-      
-      const workerBlob = new Blob([workerCode], { type: 'application/javascript' });
-      const workerUrl = URL.createObjectURL(workerBlob);
-      const worker = new Worker(workerUrl);
-      
-      if (cancelToken) {
-        cancelToken.promise.then(cancel => {
+
+        const workerBlob = new Blob([workerCode], { type: 'application/javascript' });
+        const workerUrl = URL.createObjectURL(workerBlob);
+        const worker = new Worker(workerUrl);
+
+        if (cancelToken) {
+          cancelToken.promise.then(cancel => {
+            worker.terminate();
+            URL.revokeObjectURL(workerUrl);
+            reject(cancel);
+          });
+        }
+        worker.onmessage = e => {
           worker.terminate();
           URL.revokeObjectURL(workerUrl);
-          reject(cancel);
-        });
-      }
-      worker.onmessage = e => {
-        worker.terminate();
-        URL.revokeObjectURL(workerUrl);
-        resolve(e.data);
-      };
-      worker.onerror = error => {
-        worker.terminate();
-        URL.revokeObjectURL(workerUrl);
+          resolve(e.data);
+        };
+        worker.onerror = error => {
+          worker.terminate();
+          URL.revokeObjectURL(workerUrl);
+          reject(error);
+        };
+        worker.postMessage(code);
+      } catch (error) {
         reject(error);
-      };
-      worker.postMessage(code);
-    } catch (error) {
-      reject(error);
-    }
-  }),
+      }
+    }),
   cpp: POST('/tracers/cpp'),
   java: POST('/tracers/java'),
 };

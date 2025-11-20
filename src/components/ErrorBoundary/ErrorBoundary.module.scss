@@ -47,13 +47,13 @@
 .details {
   text-align: left;
   margin-bottom: 24px;
-  
+
   summary {
     cursor: pointer;
     font-weight: bold;
     margin-bottom: 8px;
     color: $color-font;
-    
+
     &:hover {
       opacity: 0.8;
     }
@@ -100,7 +100,7 @@
 .primaryButton {
   background: $color-selected;
   color: white;
-  
+
   &:hover {
     opacity: 0.9;
   }
@@ -110,9 +110,8 @@
   background: transparent;
   color: $color-font;
   border: 1px solid $theme-light;
-  
+
   &:hover {
     background: rgba($color-selected, 0.1);
   }
 }
-

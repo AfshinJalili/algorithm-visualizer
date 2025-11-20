@@ -25,4 +25,3 @@ describe('Renderer', () => {
     expect(renderer.toString(false)).toBe('F');
   });
 });
-

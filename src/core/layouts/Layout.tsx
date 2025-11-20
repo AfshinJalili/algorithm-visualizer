@@ -49,10 +49,10 @@ class Layout {
     const horizontal = this.horizontal;
 
     return (
-      <ResizableContainer 
-        key={this.key} 
-        ref={this.ref} 
-        weights={this.weights} 
+      <ResizableContainer
+        key={this.key}
+        ref={this.ref}
+        weights={this.weights}
         horizontal={horizontal}
         onChangeWeights={this.handleChangeWeights}
       >

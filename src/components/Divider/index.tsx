@@ -29,9 +29,13 @@ const Divider: React.FC<DividerProps> = ({ className, horizontal, onResize }) =>
   };
 
   return (
-    <div 
-      className={classes(styles.divider, horizontal ? styles.horizontal : styles.vertical, className)}
-      onMouseDown={handleMouseDown} 
+    <div
+      className={classes(
+        styles.divider,
+        horizontal ? styles.horizontal : styles.vertical,
+        className
+      )}
+      onMouseDown={handleMouseDown}
     />
   );
 };

@@ -20,7 +20,7 @@ const VisualizationViewer: React.FC<VisualizationViewerProps> = ({ className }) 
   const handleError = (error: Error) => {
     if ((error as any).response) {
       const { data, statusText } = (error as any).response;
-      const message = data ? typeof data === 'string' ? data : JSON.stringify(data) : statusText;
+      const message = data ? (typeof data === 'string' ? data : JSON.stringify(data)) : statusText;
       console.error(message);
       dispatch(showErrorToast(message));
     } else {
@@ -45,7 +45,11 @@ const VisualizationViewer: React.FC<VisualizationViewerProps> = ({ className }) 
       } else if (method in LayoutClasses) {
         const [children] = args;
         const LayoutClass = (LayoutClasses as any)[method];
-        objectsRef.current[key] = new LayoutClass(key, (k: string) => objectsRef.current[k], children);
+        objectsRef.current[key] = new LayoutClass(
+          key,
+          (k: string) => objectsRef.current[k],
+          children
+        );
       } else if (method in TracerClasses) {
         const className = method;
         const [title = className] = args;
@@ -79,7 +83,7 @@ const VisualizationViewer: React.FC<VisualizationViewerProps> = ({ className }) 
     } else {
       dispatch(setLineIndicator(undefined));
     }
-    
+
     forceUpdate({});
   };
 

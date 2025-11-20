@@ -1,0 +1,46 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "plugins": ["@typescript-eslint", "react", "react-hooks"],
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "warn",
+    "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-unused-expressions": "warn",
+    "@typescript-eslint/no-unsafe-function-type": "warn",
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off",
+    "react/jsx-no-target-blank": "warn",
+    "react-hooks/exhaustive-deps": "warn",
+    "react-hooks/immutability": "warn",
+    "react-hooks/set-state-in-effect": "warn",
+    "react-hooks/refs": "warn",
+    "no-console": ["warn", { "allow": ["warn", "error"] }],
+    "no-async-promise-executor": "warn",
+    "no-useless-escape": "warn",
+    "prefer-rest-params": "warn"
+  },
+  "env": {
+    "browser": true,
+    "es2020": true,
+    "node": true
+  },
+  "ignorePatterns": ["dist", "build", "node_modules", "*.config.js", "*.config.ts"]
+}
