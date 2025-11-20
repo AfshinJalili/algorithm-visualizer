@@ -3,10 +3,17 @@ import axios, { CancelToken } from 'axios';
 
 axios.interceptors.response.use(response => response.data);
 
-const request = (url: string, process: (mappedURL: string, args: any[]) => Promise<any>) => {
+type RequestArgs =
+  | [params?: unknown, cancelToken?: CancelToken]
+  | [body?: unknown, params?: unknown, cancelToken?: CancelToken];
+
+const request = <T = unknown>(
+  url: string,
+  process: (mappedURL: string, args: unknown[]) => Promise<T>
+) => {
   const tokens = url.split('/');
   const baseURL = /^https?:\/\//i.test(url) ? '' : '/api';
-  return (...args: any[]) => {
+  return (...args: unknown[]) => {
     const mappedURL =
       baseURL + tokens.map(token => (token.startsWith(':') ? args.shift() : token)).join('/');
     return Promise.resolve(process(mappedURL, args));
@@ -15,35 +22,35 @@ const request = (url: string, process: (mappedURL: string, args: any[]) => Promi
 
 const GET = (URL: string) => {
   return request(URL, (mappedURL, args) => {
-    const [params, cancelToken] = args;
+    const [params, cancelToken] = args as [unknown?, CancelToken?];
     return axios.get(mappedURL, { params, cancelToken });
   });
 };
 
 const DELETE = (URL: string) => {
   return request(URL, (mappedURL, args) => {
-    const [params, cancelToken] = args;
+    const [params, cancelToken] = args as [unknown?, CancelToken?];
     return axios.delete(mappedURL, { params, cancelToken });
   });
 };
 
 const POST = (URL: string) => {
   return request(URL, (mappedURL, args) => {
-    const [body, params, cancelToken] = args;
+    const [body, params, cancelToken] = args as [unknown?, unknown?, CancelToken?];
     return axios.post(mappedURL, body, { params, cancelToken });
   });
 };
 
 const PUT = (URL: string) => {
   return request(URL, (mappedURL, args) => {
-    const [body, params, cancelToken] = args;
+    const [body, params, cancelToken] = args as [unknown?, unknown?, CancelToken?];
     return axios.put(mappedURL, body, { params, cancelToken });
   });
 };
 
 const PATCH = (URL: string) => {
   return request(URL, (mappedURL, args) => {
-    const [body, params, cancelToken] = args;
+    const [body, params, cancelToken] = args as [unknown?, unknown?, CancelToken?];
     return axios.patch(mappedURL, body, { params, cancelToken });
   });
 };
@@ -89,13 +96,14 @@ export const TracerApi = {
       },
     ]),
   json: ({ code }: { code: string }) => new Promise(resolve => resolve(JSON.parse(code))),
-  js: ({ code }: { code: string }, params?: any, cancelToken?: CancelToken) =>
-    new Promise(async (resolve, reject) => {
-      try {
-        const libResponse = await fetch('/api/tracers/js');
-        const libText = await libResponse.text();
+  js: ({ code }: { code: string }, params?: Record<string, unknown>, cancelToken?: CancelToken) =>
+    new Promise((resolve, reject) => {
+      (async () => {
+        try {
+          const libResponse = await fetch('/api/tracers/js');
+          const libText = await libResponse.text();
 
-        const workerCode = `
+          const workerCode = `
 const process = { env: { ALGORITHM_VISUALIZER: '1' } };
 ${libText}
 
@@ -112,31 +120,32 @@ onmessage = e => {
 };
 `;
 
-        const workerBlob = new Blob([workerCode], { type: 'application/javascript' });
-        const workerUrl = URL.createObjectURL(workerBlob);
-        const worker = new Worker(workerUrl);
+          const workerBlob = new Blob([workerCode], { type: 'application/javascript' });
+          const workerUrl = URL.createObjectURL(workerBlob);
+          const worker = new Worker(workerUrl);
 
-        if (cancelToken) {
-          cancelToken.promise.then(cancel => {
+          if (cancelToken) {
+            cancelToken.promise.then(cancel => {
+              worker.terminate();
+              URL.revokeObjectURL(workerUrl);
+              reject(cancel);
+            });
+          }
+          worker.onmessage = e => {
             worker.terminate();
             URL.revokeObjectURL(workerUrl);
-            reject(cancel);
-          });
-        }
-        worker.onmessage = e => {
-          worker.terminate();
-          URL.revokeObjectURL(workerUrl);
-          resolve(e.data);
-        };
-        worker.onerror = error => {
-          worker.terminate();
-          URL.revokeObjectURL(workerUrl);
+            resolve(e.data);
+          };
+          worker.onerror = error => {
+            worker.terminate();
+            URL.revokeObjectURL(workerUrl);
+            reject(error);
+          };
+          worker.postMessage(code);
+        } catch (error) {
           reject(error);
-        };
-        worker.postMessage(code);
-      } catch (error) {
-        reject(error);
-      }
+        }
+      })();
     }),
   cpp: POST('/tracers/cpp'),
   java: POST('/tracers/java'),

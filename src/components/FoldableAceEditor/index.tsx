@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
-import AceEditor from 'react-ace';
+import AceEditor, { IAceEditorProps } from 'react-ace';
 import 'ace-builds/src-noconflict/mode-text';
 import 'ace-builds/src-noconflict/mode-markdown';
 import 'ace-builds/src-noconflict/mode-json';
@@ -10,13 +10,13 @@ import 'ace-builds/src-noconflict/theme-tomorrow_night_eighties';
 import 'ace-builds/src-noconflict/ext-searchbox';
 import { useAppSelector } from '../../store';
 
-interface FoldableAceEditorProps {
-  [key: string]: any;
+interface FoldableAceEditorHandle {
+  resize: () => void;
 }
 
-const FoldableAceEditor = forwardRef<any, FoldableAceEditorProps>((props, ref) => {
+const FoldableAceEditor = forwardRef<FoldableAceEditorHandle, IAceEditorProps>((props, ref) => {
   const { shouldBuild, editingFile } = useAppSelector(state => state.current);
-  const aceEditorRef = useRef<any>(null);
+  const aceEditorRef = useRef<AceEditor>(null);
 
   const foldTracers = () => {
     if (!aceEditorRef.current?.editor) return;

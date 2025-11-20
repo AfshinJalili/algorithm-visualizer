@@ -3,10 +3,10 @@ import { Renderer } from 'core/renderers';
 
 class Tracer {
   key: string;
-  getObject: (key: string) => any;
+  getObject: (key: string) => Tracer | undefined;
   title: string;
 
-  constructor(key: string, getObject: (key: string) => any, title: string) {
+  constructor(key: string, getObject: (key: string) => Tracer | undefined, title: string) {
     this.key = key;
     this.getObject = getObject;
     this.title = title;

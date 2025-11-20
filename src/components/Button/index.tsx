@@ -6,7 +6,7 @@ import { classes } from 'common/util';
 import Ellipsis from 'components/Ellipsis';
 import styles from './Button.module.scss';
 
-interface ButtonProps {
+interface ButtonProps extends Omit<React.HTMLAttributes<HTMLElement>, 'onClick'> {
   className?: string;
   children?: ReactNode;
   to?: string | null;
@@ -20,7 +20,6 @@ interface ButtonProps {
   active?: boolean;
   confirmNeeded?: boolean;
   inProgress?: boolean;
-  [key: string]: any;
 }
 
 const Button: React.FC<ButtonProps> = ({

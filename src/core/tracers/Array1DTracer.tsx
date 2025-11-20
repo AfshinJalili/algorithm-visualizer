@@ -1,8 +1,9 @@
 import Array2DTracer from './Array2DTracer';
 import { Array1DRenderer } from 'core/renderers';
+import type ChartTracer from './ChartTracer';
 
 class Array1DTracer extends Array2DTracer {
-  chartTracer: any;
+  chartTracer: ChartTracer | null;
 
   getRendererClass() {
     return Array1DRenderer;
@@ -13,13 +14,13 @@ class Array1DTracer extends Array2DTracer {
     this.chartTracer = null;
   }
 
-  set(array1d: any[] = []) {
+  set(array1d: unknown[] = []) {
     const array2d = [array1d];
     super.set(array2d);
     this.syncChartTracer();
   }
 
-  patch(x: number, v: any) {
+  patch(x: number, v: unknown) {
     super.patch(0, x, v);
   }
 

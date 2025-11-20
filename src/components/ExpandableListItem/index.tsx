@@ -5,11 +5,10 @@ import styles from './ExpandableListItem.module.scss';
 import ListItem from 'components/ListItem';
 import { classes } from 'common/util';
 
-interface ExpandableListItemProps {
+interface ExpandableListItemProps extends React.ComponentProps<typeof ListItem> {
   className?: string;
   children?: ReactNode;
   opened: boolean;
-  [key: string]: any;
 }
 
 const ExpandableListItem: React.FC<ExpandableListItemProps> = ({

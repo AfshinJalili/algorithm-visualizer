@@ -69,7 +69,7 @@ const CodeEditor = forwardRef<any, CodeEditorProps>(({ className }, ref) => {
       <div className={classes(styles.contributors_viewer, className)}>
         <span className={classes(styles.contributor, styles.label)}>Contributed by</span>
         {(editingFile.contributors || [user || { login: 'guest', avatar_url: faUser }]).map(
-          (contributor: any) => (
+          (contributor: { login: string; avatar_url: string | typeof faUser }) => (
             <Button
               className={styles.contributor}
               icon={contributor.avatar_url}

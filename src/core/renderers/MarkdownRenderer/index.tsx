@@ -2,19 +2,33 @@ import React from 'react';
 import { Renderer } from 'core/renderers';
 import styles from './MarkdownRenderer.module.scss';
 import ReactMarkdown from 'react-markdown';
+import type MarkdownTracer from 'core/tracers/MarkdownTracer';
 
-class MarkdownRenderer extends Renderer {
+type HeadingProps = React.HTMLAttributes<HTMLHeadingElement> & {
+  level: number;
+  children: React.ReactNode;
+};
+
+type LinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+  href?: string;
+};
+
+type ImageProps = React.ImgHTMLAttributes<HTMLImageElement> & {
+  src?: string;
+};
+
+class MarkdownRenderer extends Renderer<MarkdownTracer> {
   renderData() {
     const { markdown } = this.props.data;
 
-    const heading = ({ level, children, ...rest }: any) => {
+    const heading = ({ level, children, ...rest }: HeadingProps) => {
       const HeadingComponent = [
-        (props: any) => <h1 {...props} />,
-        (props: any) => <h2 {...props} />,
-        (props: any) => <h3 {...props} />,
-        (props: any) => <h4 {...props} />,
-        (props: any) => <h5 {...props} />,
-        (props: any) => <h6 {...props} />,
+        (props: React.HTMLAttributes<HTMLHeadingElement>) => <h1 {...props} />,
+        (props: React.HTMLAttributes<HTMLHeadingElement>) => <h2 {...props} />,
+        (props: React.HTMLAttributes<HTMLHeadingElement>) => <h3 {...props} />,
+        (props: React.HTMLAttributes<HTMLHeadingElement>) => <h4 {...props} />,
+        (props: React.HTMLAttributes<HTMLHeadingElement>) => <h5 {...props} />,
+        (props: React.HTMLAttributes<HTMLHeadingElement>) => <h6 {...props} />,
       ][level - 1];
 
       const idfy = (text: string) =>
@@ -24,13 +38,16 @@ class MarkdownRenderer extends Renderer {
           .replace(/[^\w \-]/g, '')
           .replace(/ /g, '-');
 
-      const getText = (children: any): string => {
-        return React.Children.map(children, child => {
-          if (!child) return '';
-          if (typeof child === 'string') return child;
-          if ('props' in child) return getText(child.props.children);
-          return '';
-        }).join('');
+      const getText = (children: React.ReactNode): string => {
+        return (
+          React.Children.map(children, child => {
+            if (!child) return '';
+            if (typeof child === 'string') return child;
+            if (typeof child === 'object' && 'props' in child)
+              return getText((child as React.ReactElement).props.children);
+            return '';
+          })?.join('') || ''
+        );
       };
 
       const id = idfy(getText(children));
@@ -42,15 +59,15 @@ class MarkdownRenderer extends Renderer {
       );
     };
 
-    const link = ({ href, ...rest }: any) => {
-      return /^#/.test(href) ? (
+    const link = ({ href, ...rest }: LinkProps) => {
+      return /^#/.test(href || '') ? (
         <a href={href} {...rest} />
       ) : (
         <a href={href} rel="noopener" target="_blank" {...rest} />
       );
     };
 
-    const image = ({ src, ...rest }: any) => {
+    const image = ({ src, ...rest }: ImageProps) => {
       let newSrc = src;
       const style: React.CSSProperties = { maxWidth: '100%' };
       const CODECOGS = 'https://latex.codecogs.com/svg.latex?';

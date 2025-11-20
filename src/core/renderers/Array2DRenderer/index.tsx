@@ -2,9 +2,16 @@ import React from 'react';
 import { Array1DRenderer, Renderer } from 'core/renderers';
 import styles from './Array2DRenderer.module.scss';
 import { classes } from 'common/util';
+import type Array2DTracer from 'core/tracers/Array2DTracer';
 
-class Array2DRenderer extends Renderer {
-  constructor(props: any) {
+interface Element {
+  value: unknown;
+  selected: boolean;
+  patched: boolean;
+}
+
+class Array2DRenderer extends Renderer<Array2DTracer> {
+  constructor(props: { className?: string; title: string; data: Array2DTracer }) {
     super(props);
 
     this.togglePan(true);
@@ -20,7 +27,8 @@ class Array2DRenderer extends Renderer {
 
     const isArray1D = this instanceof Array1DRenderer;
     const longestRow = data.reduce(
-      (longestRow: any[], row: any[]) => (longestRow.length < row.length ? row : longestRow),
+      (longestRow: Element[], row: Element[]) =>
+        longestRow.length < row.length ? row : longestRow,
       []
     );
 
@@ -36,20 +44,20 @@ class Array2DRenderer extends Renderer {
         <tbody>
           <tr className={styles.row}>
             {!isArray1D && <td className={classes(styles.col, styles.index)} />}
-            {longestRow.map((_: any, i: number) => (
+            {longestRow.map((_, i: number) => (
               <td className={classes(styles.col, styles.index)} key={i}>
                 <span className={styles.value}>{i}</span>
               </td>
             ))}
           </tr>
-          {data.map((row: any[], i: number) => (
+          {data.map((row: Element[], i: number) => (
             <tr className={styles.row} key={i}>
               {!isArray1D && (
                 <td className={classes(styles.col, styles.index)}>
                   <span className={styles.value}>{i}</span>
                 </td>
               )}
-              {row.map((col: any, j: number) => (
+              {row.map((col: Element, j: number) => (
                 <td
                   className={classes(
                     styles.col,

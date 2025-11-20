@@ -4,12 +4,11 @@ import { classes } from 'common/util';
 import Button from 'components/Button';
 import Ellipsis from 'components/Ellipsis';
 
-interface ListItemProps {
+interface ListItemProps extends React.ComponentProps<typeof Button> {
   className?: string;
   children?: ReactNode;
   indent?: boolean;
-  label: ReactNode;
-  [key: string]: any;
+  label?: ReactNode;
 }
 
 const ListItem: React.FC<ListItemProps> = ({ className, children, indent, label, ...props }) => {

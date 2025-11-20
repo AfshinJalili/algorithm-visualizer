@@ -22,7 +22,7 @@ class LogTracer extends Tracer {
     this.print(message + '\n');
   }
 
-  printf(format: string, ...args: any[]) {
+  printf(format: string, ...args: unknown[]) {
     this.print(sprintf(format, ...args));
   }
 }

@@ -2,11 +2,11 @@ import Tracer from './Tracer';
 import { Array2DRenderer } from 'core/renderers';
 
 class Element {
-  value: any;
+  value: unknown;
   patched: boolean;
   selected: boolean;
 
-  constructor(value: any) {
+  constructor(value: unknown) {
     this.value = value;
     this.patched = false;
     this.selected = false;
@@ -20,12 +20,12 @@ class Array2DTracer extends Tracer {
     return Array2DRenderer;
   }
 
-  set(array2d: any[][] = []) {
+  set(array2d: unknown[][] = []) {
     this.data = array2d.map(array1d => [...array1d].map(value => new Element(value)));
     super.set();
   }
 
-  patch(x: number, y: number, v: any = this.data[x][y].value) {
+  patch(x: number, y: number, v: unknown = this.data[x][y].value) {
     if (!this.data[x][y]) this.data[x][y] = new Element(v);
     this.data[x][y].value = v;
     this.data[x][y].patched = true;

@@ -33,7 +33,7 @@ declare global {
   interface Window {
     signIn?: (token: string) => void;
     signOut?: () => void;
-    __PRELOADED_ALGORITHM__?: any;
+    __PRELOADED_ALGORITHM__?: unknown;
   }
 }
 
@@ -86,9 +86,13 @@ const App: React.FC = () => {
         window.onbeforeunload = () => {
           if (!saved) return warningMessage;
         };
-        unblockRef.current = (navigate as any).block?.((nextLocation: any) => {
+        unblockRef.current = (
+          navigate as {
+            block?: (callback: (nextLocation: { pathname: string }) => void | false) => () => void;
+          }
+        ).block?.((nextLocation: { pathname: string }) => {
           if (nextLocation.pathname === location.pathname) return;
-          if (!saved) return warningMessage;
+          if (!saved) return false as never;
         });
       } else {
         window.onbeforeunload = undefined;
@@ -112,29 +116,33 @@ const App: React.FC = () => {
 
   const loadScratchPapers = useCallback(() => {
     const per_page = 100;
-    const paginateGists = (page = 1, scratchPapers: any[] = []): any =>
+    const paginateGists = (page = 1, scratchPapers: unknown[] = []): Promise<unknown[]> =>
       GitHubApi.listGists({
         per_page,
         page,
         timestamp: Date.now(),
-      }).then((gists: any) => {
-        scratchPapers.push(
-          ...gists
-            .filter((gist: any) => 'algorithm-visualizer' in gist.files)
-            .map((gist: any) => ({
-              key: gist.id,
-              name: gist.description,
-              files: Object.keys(gist.files),
-            }))
-        );
-        if (gists.length < per_page) {
-          return scratchPapers;
-        } else {
-          return paginateGists(page + 1, scratchPapers);
+      }).then(
+        (gists: Array<{ id: string; description: string; files: Record<string, unknown> }>) => {
+          scratchPapers.push(
+            ...gists
+              .filter(
+                (gist: { files: Record<string, unknown> }) => 'algorithm-visualizer' in gist.files
+              )
+              .map((gist: { id: string; description: string; files: Record<string, unknown> }) => ({
+                key: gist.id,
+                name: gist.description,
+                files: Object.keys(gist.files),
+              }))
+          );
+          if (gists.length < per_page) {
+            return scratchPapers;
+          } else {
+            return paginateGists(page + 1, scratchPapers);
+          }
         }
-      });
+      );
     return paginateGists()
-      .then((scratchPapers: any) => dispatch(setScratchPapers(scratchPapers)))
+      .then((scratchPapers: unknown[]) => dispatch(setScratchPapers(scratchPapers as never)))
       .catch(handleError);
   }, [dispatch, handleError]);
 
@@ -143,7 +151,7 @@ const App: React.FC = () => {
       Cookies.set('access_token', accessToken);
       GitHubApi.auth(accessToken)
         .then(() => GitHubApi.getUser())
-        .then((user: any) => {
+        .then((user: { login: string; avatar_url: string }) => {
           const { login, avatar_url } = user;
           dispatch(setUser({ login, avatar_url }));
         })
@@ -172,7 +180,10 @@ const App: React.FC = () => {
   }, [files, currentExt, dispatch]);
 
   const loadAlgorithm = useCallback(
-    (params: any, query: any) => {
+    (
+      params: { categoryKey?: string; algorithmKey?: string; gistId?: string },
+      query: { visualizationId?: string }
+    ) => {
       const { categoryKey, algorithmKey, gistId } = params;
       const { visualizationId } = query;
       const fetch = () => {
@@ -183,11 +194,11 @@ const App: React.FC = () => {
           delete window.__PRELOADED_ALGORITHM__;
           return Promise.reject(new Error('Algorithm Not Found'));
         } else if (categoryKey && algorithmKey) {
-          return AlgorithmApi.getAlgorithm(categoryKey, algorithmKey).then(({ algorithm }: any) =>
-            dispatch(setAlgorithm(algorithm))
+          return AlgorithmApi.getAlgorithm(categoryKey, algorithmKey).then(
+            ({ algorithm }: { algorithm: unknown }) => dispatch(setAlgorithm(algorithm as never))
           );
         } else if (gistId === 'new' && visualizationId) {
-          return VisualizationApi.getVisualization(visualizationId).then((content: any) => {
+          return VisualizationApi.getVisualization(visualizationId).then((content: string) => {
             dispatch(
               setScratchPaper({
                 login: '',
@@ -215,7 +226,7 @@ const App: React.FC = () => {
         } else if (gistId) {
           return GitHubApi.getGist(gistId, { timestamp: Date.now() })
             .then(refineGist)
-            .then((sp: any) => dispatch(setScratchPaper(sp)));
+            .then((sp: unknown) => dispatch(setScratchPaper(sp as never)));
         } else {
           dispatch(setHome());
         }
@@ -259,7 +270,9 @@ const App: React.FC = () => {
     if (accessToken) signIn(accessToken);
 
     AlgorithmApi.getCategories()
-      .then(({ categories }: any) => dispatch(setCategories(categories)))
+      .then(({ categories }: { categories: unknown }) =>
+        dispatch(setCategories(categories as never))
+      )
       .catch(handleError);
 
     toggleHistoryBlock(true);

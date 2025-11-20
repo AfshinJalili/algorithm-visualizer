@@ -3,6 +3,12 @@ import { Bar } from 'react-chartjs-2';
 import { Array1DRenderer } from 'core/renderers';
 import styles from './ChartRenderer.module.scss';
 
+interface Element {
+  value: unknown;
+  selected: boolean;
+  patched: boolean;
+}
+
 class ChartRenderer extends Array1DRenderer {
   renderData() {
     const {
@@ -10,17 +16,17 @@ class ChartRenderer extends Array1DRenderer {
     } = this.props.data;
 
     const chartData = {
-      labels: row.map((col: any) => `${col.value}`),
+      labels: row.map((col: Element) => `${col.value}`),
       datasets: [
         {
-          backgroundColor: row.map((col: any) =>
+          backgroundColor: row.map((col: Element) =>
             col.patched
               ? styles.colorPatched
               : col.selected
                 ? styles.colorSelected
                 : styles.colorFont
           ),
-          data: row.map((col: any) => col.value),
+          data: row.map((col: Element) => col.value),
         },
       ],
     };

@@ -88,7 +88,24 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const saveGist = () => {
-    const gist: any = {
+    interface GistFile {
+      content?: string;
+    }
+    interface Gist {
+      description: string;
+      files: Record<string, GistFile | null>;
+    }
+    interface GistResponse {
+      id: string;
+      [key: string]: unknown;
+    }
+    interface ScratchPaper {
+      gistId: string;
+      files: { name: string; [key: string]: unknown }[];
+      [key: string]: unknown;
+    }
+
+    const gist: Gist = {
       description: titles[titles.length - 1],
       files: {},
     };
@@ -105,25 +122,27 @@ const Header: React.FC<HeaderProps> = ({
     gist.files['algorithm-visualizer'] = {
       content: 'https://algorithm-visualizer.org/',
     };
-    const save = (g: any) => {
+    const save = (g: Gist): Promise<GistResponse> => {
       if (!user) return Promise.reject(new Error('Sign In Required'));
       if (scratchPaper && scratchPaper.login) {
         if (scratchPaper.login === user.login) {
-          return GitHubApi.editGist(scratchPaper.gistId, g);
+          return GitHubApi.editGist(scratchPaper.gistId, g) as Promise<GistResponse>;
         } else {
-          return GitHubApi.forkGist(scratchPaper.gistId).then((forkedGist: any) =>
+          return GitHubApi.forkGist(scratchPaper.gistId).then((forkedGist: GistResponse) =>
             GitHubApi.editGist(forkedGist.id, g)
-          );
+          ) as Promise<GistResponse>;
         }
       }
-      return GitHubApi.createGist(g);
+      return GitHubApi.createGist(g) as Promise<GistResponse>;
     };
     save(gist)
       .then(refineGist)
-      .then((newScratchPaper: any) => {
+      .then((newScratchPaper: ScratchPaper) => {
         dispatch(setScratchPaper(newScratchPaper));
         dispatch(
-          setEditingFile(newScratchPaper.files.find((file: any) => file.name === editingFile?.name))
+          setEditingFile(
+            newScratchPaper.files.find((file: { name: string }) => file.name === editingFile?.name)
+          )
         );
         if (!(scratchPaper && scratchPaper.gistId === newScratchPaper.gistId)) {
           navigate(`/scratch-paper/${newScratchPaper.gistId}`);

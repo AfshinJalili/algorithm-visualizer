@@ -1,6 +1,7 @@
 import Tracer from './Tracer';
 import { distance } from 'common/util';
 import { GraphRenderer } from 'core/renderers';
+import type LogTracer from './LogTracer';
 
 interface Dimensions {
   baseWidth: number;
@@ -29,6 +30,8 @@ interface Edge {
   selectedCount: number;
 }
 
+type LayoutMethod = (...args: unknown[]) => void;
+
 class GraphTracer extends Tracer {
   dimensions: Dimensions = {
     baseWidth: 320,
@@ -41,8 +44,8 @@ class GraphTracer extends Tracer {
   };
   isDirected: boolean = true;
   isWeighted: boolean = false;
-  callLayout: { method: Function; args: any } = { method: this.layoutCircle, args: [] };
-  logTracer: any = null;
+  callLayout: { method: LayoutMethod; args: unknown[] } = { method: this.layoutCircle, args: [] };
+  logTracer: LogTracer | null = null;
   nodes: Node[] = [];
   edges: Edge[] = [];
 
@@ -69,7 +72,7 @@ class GraphTracer extends Tracer {
     this.logTracer = null;
   }
 
-  set(array2d: any[][] = []) {
+  set(array2d: unknown[][] = []) {
     this.nodes = [];
     this.edges = [];
     for (let i = 0; i < array2d.length; i++) {
@@ -115,9 +118,9 @@ class GraphTracer extends Tracer {
     selectedCount?: number
   ) {
     const node = this.findNode(id);
-    const update: any = { weight, x, y, visitedCount, selectedCount };
+    const update: Partial<Node> = { weight, x, y, visitedCount, selectedCount };
     Object.keys(update).forEach(key => {
-      if (update[key] === undefined) delete update[key];
+      if (update[key as keyof Node] === undefined) delete update[key as keyof Node];
     });
     Object.assign(node, update);
   }
@@ -150,9 +153,14 @@ class GraphTracer extends Tracer {
     selectedCount?: number
   ) {
     const edge = this.findEdge(source, target);
-    const update: any = { weight, visitedCount, selectedCount };
+    const update: Partial<Omit<Edge, 'source' | 'target'>> = {
+      weight,
+      visitedCount,
+      selectedCount,
+    };
     Object.keys(update).forEach(key => {
-      if (update[key] === undefined) delete update[key];
+      if (update[key as keyof typeof update] === undefined)
+        delete update[key as keyof typeof update];
     });
     Object.assign(edge, update);
   }
@@ -219,8 +227,8 @@ class GraphTracer extends Tracer {
     method.apply(this, args);
   }
 
-  layoutCircle() {
-    this.callLayout = { method: this.layoutCircle, args: arguments };
+  layoutCircle(...args: unknown[]) {
+    this.callLayout = { method: this.layoutCircle, args };
     const rect = this.getRect();
     const unitAngle = (2 * Math.PI) / this.nodes.length;
     let angle = -Math.PI / 2;
@@ -234,7 +242,7 @@ class GraphTracer extends Tracer {
   }
 
   layoutTree(root: number = 0, sorted: boolean = false) {
-    this.callLayout = { method: this.layoutTree, args: arguments };
+    this.callLayout = { method: this.layoutTree, args: [root, sorted] };
     const rect = this.getRect();
 
     if (this.nodes.length === 1) {
@@ -282,8 +290,8 @@ class GraphTracer extends Tracer {
     if (rootNode) recursivePosition(rootNode, 0, 0);
   }
 
-  layoutRandom() {
-    this.callLayout = { method: this.layoutRandom, args: arguments };
+  layoutRandom(...args: unknown[]) {
+    this.callLayout = { method: this.layoutRandom, args };
     const rect = this.getRect();
     const placedNodes: Node[] = [];
     for (const node of this.nodes) {

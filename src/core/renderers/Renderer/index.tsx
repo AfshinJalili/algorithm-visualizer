@@ -3,13 +3,13 @@ import styles from './Renderer.module.scss';
 import Ellipsis from 'components/Ellipsis';
 import { classes } from 'common/util';
 
-interface RendererProps {
+interface RendererProps<T = unknown> {
   className?: string;
   title: string;
-  data: any;
+  data: T;
 }
 
-class Renderer extends React.Component<RendererProps> {
+class Renderer<T = unknown> extends React.Component<RendererProps<T>> {
   _handleMouseDown: ((e: React.MouseEvent) => void) | undefined;
   _handleWheel: ((e: React.WheelEvent) => void) | undefined;
   handleMouseDown: ((e: React.MouseEvent) => void) | undefined;
@@ -46,7 +46,7 @@ class Renderer extends React.Component<RendererProps> {
     this.zoomMin = 1 / 20;
   }
 
-  componentDidUpdate(prevProps: RendererProps, prevState: any, snapshot: any) {}
+  componentDidUpdate(prevProps: RendererProps<T>, prevState: unknown, snapshot: unknown) {}
 
   togglePan(enable: boolean = !this.handleMouseDown) {
     this.handleMouseDown = enable ? this._handleMouseDown : undefined;
@@ -88,7 +88,7 @@ class Renderer extends React.Component<RendererProps> {
     this.refresh();
   }
 
-  toString(value: any): string {
+  toString(value: unknown): string {
     switch (typeof value) {
       case 'number':
         return [Number.POSITIVE_INFINITY, Number.MAX_SAFE_INTEGER, 0x7fffffff].includes(value)

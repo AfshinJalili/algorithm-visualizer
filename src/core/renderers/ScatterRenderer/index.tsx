@@ -5,11 +5,17 @@ import Array2DRenderer from '../Array2DRenderer';
 const convertToObjectArray = ([x, y]: [number, number]) => ({ x, y });
 const colors = ['white', 'green', 'blue', 'red', 'yellow', 'cyan'];
 
+interface Element {
+  value: [number, number];
+  selected: boolean;
+  patched: boolean;
+}
+
 class ScatterRenderer extends Array2DRenderer {
   renderData() {
     const { data } = this.props.data;
 
-    const datasets = data.map((series: any[], index: number) => ({
+    const datasets = data.map((series: Element[], index: number) => ({
       backgroundColor: colors[index],
       data: series.map(s => convertToObjectArray(s.value)),
       label: Math.random(),

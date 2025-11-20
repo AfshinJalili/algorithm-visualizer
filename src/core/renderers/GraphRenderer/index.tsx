@@ -2,12 +2,30 @@ import React from 'react';
 import { Renderer } from 'core/renderers';
 import { classes, distance } from 'common/util';
 import styles from './GraphRenderer.module.scss';
+import type GraphTracer from 'core/tracers/GraphTracer';
 
-class GraphRenderer extends Renderer {
+interface Node {
+  id: number;
+  weight: number | null;
+  x: number;
+  y: number;
+  visitedCount: number;
+  selectedCount: number;
+}
+
+interface Edge {
+  source: number;
+  target: number;
+  weight: number | null;
+  visitedCount: number;
+  selectedCount: number;
+}
+
+class GraphRenderer extends Renderer<GraphTracer> {
   elementRef: React.RefObject<SVGSVGElement>;
-  selectedNode: any;
+  selectedNode: Node | null;
 
-  constructor(props: any) {
+  constructor(props: { className?: string; title: string; data: GraphTracer }) {
     super(props);
 
     this.elementRef = React.createRef();
@@ -22,12 +40,12 @@ class GraphRenderer extends Renderer {
     const coords = this.computeCoords(e);
     const { nodes, dimensions } = this.props.data;
     const { nodeRadius } = dimensions;
-    this.selectedNode = nodes.find((node: any) => distance(coords, node) <= nodeRadius);
+    this.selectedNode = nodes.find((node: Node) => distance(coords, node) <= nodeRadius) || null;
   }
 
   handleMouseMove(e: MouseEvent) {
     if (this.selectedNode) {
-      const { x, y } = this.computeCoords(e as any);
+      const { x, y } = this.computeCoords(e);
       const node = this.props.data.findNode(this.selectedNode.id);
       node.x = x;
       node.y = y;
@@ -37,7 +55,7 @@ class GraphRenderer extends Renderer {
     }
   }
 
-  computeCoords(e: any): { x: number; y: number } {
+  computeCoords(e: React.MouseEvent | MouseEvent): { x: number; y: number } {
     const svg = this.elementRef.current!;
     const s = svg.createSVGPoint();
     s.x = e.clientX;
@@ -84,8 +102,8 @@ class GraphRenderer extends Renderer {
           </marker>
         </defs>
         {edges
-          .sort((a: any, b: any) => a.visitedCount - b.visitedCount)
-          .map((edge: any) => {
+          .sort((a: Edge, b: Edge) => a.visitedCount - b.visitedCount)
+          .map((edge: Edge) => {
             const { source, target, weight, visitedCount, selectedCount } = edge;
             const sourceNode = this.props.data.findNode(source);
             const targetNode = this.props.data.findNode(target);
@@ -132,7 +150,7 @@ class GraphRenderer extends Renderer {
               </g>
             );
           })}
-        {nodes.map((node: any) => {
+        {nodes.map((node: Node) => {
           const { id, x, y, weight, visitedCount, selectedCount } = node;
           return (
             <g

@@ -10,22 +10,39 @@ interface VisualizationViewerProps {
   className?: string;
 }
 
+interface Command {
+  key: string | null;
+  method: string;
+  args: unknown[];
+}
+
+interface Chunk {
+  commands: Command[];
+}
+
+interface Renderable {
+  render: () => React.ReactNode;
+  [key: string]: unknown;
+}
+
 const VisualizationViewer: React.FC<VisualizationViewerProps> = ({ className }) => {
   const dispatch = useAppDispatch();
   const { chunks, cursor } = useAppSelector(state => state.player);
-  const rootRef = useRef<any>(null);
-  const objectsRef = useRef<Record<string, any>>({});
+  const rootRef = useRef<Renderable | null>(null);
+  const objectsRef = useRef<Record<string, Renderable>>({});
   const [, forceUpdate] = useState({});
 
-  const handleError = (error: Error) => {
-    if ((error as any).response) {
-      const { data, statusText } = (error as any).response;
+  const handleError = (error: Error | unknown) => {
+    if (error && typeof error === 'object' && 'response' in error) {
+      const response = (error as { response: { data?: unknown; statusText: string } }).response;
+      const { data, statusText } = response;
       const message = data ? (typeof data === 'string' ? data : JSON.stringify(data)) : statusText;
       console.error(message);
       dispatch(showErrorToast(message));
     } else {
-      console.error(error.message);
-      dispatch(showErrorToast(error.message));
+      const message = error instanceof Error ? error.message : String(error);
+      console.error(message);
+      dispatch(showErrorToast(message));
     }
   };
 
@@ -34,40 +51,56 @@ const VisualizationViewer: React.FC<VisualizationViewerProps> = ({ className }) 
     objectsRef.current = {};
   };
 
-  const applyCommand = (command: any) => {
+  const applyCommand = (command: Command) => {
     const { key, method, args } = command;
     try {
       if (key === null && method === 'setRoot') {
         const [root] = args;
-        rootRef.current = objectsRef.current[root];
+        rootRef.current = objectsRef.current[root as string];
       } else if (method === 'destroy') {
-        delete objectsRef.current[key];
+        delete objectsRef.current[key!];
       } else if (method in LayoutClasses) {
         const [children] = args;
-        const LayoutClass = (LayoutClasses as any)[method];
-        objectsRef.current[key] = new LayoutClass(
-          key,
+        const LayoutClass = (
+          LayoutClasses as Record<string, new (...args: unknown[]) => Renderable>
+        )[method];
+        objectsRef.current[key!] = new LayoutClass(
+          key!,
           (k: string) => objectsRef.current[k],
-          children
+          children as string[]
         );
       } else if (method in TracerClasses) {
         const className = method;
         const [title = className] = args;
-        const TracerClass = (TracerClasses as any)[className];
-        objectsRef.current[key] = new TracerClass(key, (k: string) => objectsRef.current[k], title);
+        const TracerClass = (
+          TracerClasses as Record<string, new (...args: unknown[]) => Renderable>
+        )[className];
+        objectsRef.current[key!] = new TracerClass(
+          key!,
+          (k: string) => objectsRef.current[k],
+          title as string
+        );
       } else {
-        objectsRef.current[key][method](...args);
+        const obj = objectsRef.current[key!];
+        if (obj && typeof obj[method] === 'function') {
+          (obj[method] as (...args: unknown[]) => unknown)(...args);
+        }
       }
     } catch (error) {
-      handleError(error as Error);
+      handleError(error);
     }
   };
 
-  const applyChunk = (chunk: any) => {
-    chunk.commands.forEach((command: any) => applyCommand(command));
+  const applyChunk = (chunk: Chunk) => {
+    chunk.commands.forEach((command: Command) => applyCommand(command));
   };
 
-  const update = (chunks: any[], cursor: number, oldChunks: any[] = [], oldCursor: number = 0) => {
+  const update = (
+    chunks: Chunk[],
+    cursor: number,
+    oldChunks: Chunk[] = [],
+    oldCursor: number = 0
+  ) => {
     let applyingChunks;
     if (cursor > oldCursor) {
       applyingChunks = chunks.slice(oldCursor, cursor);

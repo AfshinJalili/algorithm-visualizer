@@ -57,7 +57,7 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
   );
 
   const reset = useCallback(
-    (commands: any[] = []) => {
+    (commands: unknown[] = []) => {
       const newChunks = [
         {
           commands: [],
@@ -104,13 +104,13 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
       if (ext && ext in TracerApi) {
         (TracerApi as any)
           [ext]({ code: file.content }, undefined, tracerApiSourceRef.current.token)
-          .then((commands: any) => {
+          .then((commands: unknown) => {
             tracerApiSourceRef.current = null;
             setBuilding(false);
             reset(commands);
             dispatch(setCursor(1));
           })
-          .catch((error: any) => {
+          .catch((error: unknown) => {
             if (axios.isCancel(error)) return;
             tracerApiSourceRef.current = null;
             setBuilding(false);

@@ -1,15 +1,19 @@
 import React from 'react';
 import ResizableContainer from 'components/ResizableContainer';
 
+interface Renderable {
+  render: () => React.ReactNode;
+}
+
 class Layout {
   key: string;
-  getObject: (key: string) => any;
-  children: any[];
+  getObject: (key: string) => Renderable | undefined;
+  children: (Renderable | undefined)[];
   weights: number[];
-  ref: React.RefObject<any>;
+  ref: React.RefObject<typeof ResizableContainer>;
   horizontal: boolean;
 
-  constructor(key: string, getObject: (key: string) => any, children: string[]) {
+  constructor(key: string, getObject: (key: string) => Renderable | undefined, children: string[]) {
     this.key = key;
     this.getObject = getObject;
     this.children = children.map(key => this.getObject(key));

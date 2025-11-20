@@ -29,9 +29,9 @@ export interface EnvState {
 }
 
 export interface PlayerState {
-  chunks: any[];
+  chunks: unknown[];
   cursor: number;
-  lineIndicator?: any;
+  lineIndicator?: { lineNumber: number; cursor: number } | null;
 }
 
 export interface ToastState {
