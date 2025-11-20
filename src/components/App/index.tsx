@@ -27,7 +27,6 @@ import {
 import { createUserFile, extension, refineGist } from 'common/util';
 import { exts, languages } from 'common/config';
 import { SCRATCH_PAPER_README_MD } from 'files';
-import { cn } from "@/lib/utils";
 
 declare global {
   interface Window {
@@ -42,7 +41,7 @@ const App: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const params = useParams<{ categoryKey?: string; algorithmKey?: string; gistId?: string }>();
-  
+
   const [fileInfo, setFileInfo] = useState<React.ReactNode>(null);
   const [fileActions, setFileActions] = useState<React.ReactNode>(null);
 
@@ -325,9 +324,13 @@ const App: React.FC = () => {
           <VisualizationViewer className="flex-1 flex flex-col min-h-0 min-w-0" />
         </ErrorBoundary>
         <ErrorBoundary level="component">
-          <TabContainer className="flex-1 flex flex-col min-h-0 min-w-0" fileInfo={fileInfo} actions={fileActions}>
-            <CodeEditor 
-              ref={codeEditorRef} 
+          <TabContainer
+            className="flex-1 flex flex-col min-h-0 min-w-0"
+            fileInfo={fileInfo}
+            actions={fileActions}
+          >
+            <CodeEditor
+              ref={codeEditorRef}
               onFileInfoRender={setFileInfo}
               onActionsRender={setFileActions}
             />

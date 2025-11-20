@@ -2,10 +2,9 @@ import React, { useState, useEffect, useRef, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExclamationCircle, faSpinner, IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { classes } from 'common/util';
 import Ellipsis from 'components/Ellipsis';
-import { Button as ShadcnButton } from "components/ui/button";
-import { cn } from "@/lib/utils";
+import { Button as ShadcnButton } from 'components/ui/button';
+import { cn } from '@/lib/utils';
 
 interface ButtonProps extends Omit<React.HTMLAttributes<HTMLElement>, 'onClick'> {
   className?: string;
@@ -78,20 +77,20 @@ const Button: React.FC<ButtonProps> = ({
     }
   }
 
-  const variant = primary ? "default" : "ghost";
-  
+  const variant = primary ? 'default' : 'ghost';
+
   // Determine active/selected state styles manually since Shadcn variant might not cover all custom states perfectly without creating new variants
   // But we can mix classes.
-  
+
   return (
     <ShadcnButton
       variant={variant}
       className={cn(
         className,
-        selected && "bg-accent text-accent-foreground",
-        reverse && "flex-row-reverse",
-        active && "bg-accent text-accent-foreground font-bold",
-        !finalChildren && "px-2" // Icon only adjustment
+        selected && 'bg-accent text-accent-foreground',
+        reverse && 'flex-row-reverse',
+        active && 'bg-accent text-accent-foreground font-bold',
+        !finalChildren && 'px-2' // Icon only adjustment
       )}
       disabled={disabled}
       asChild={!!(to || href)}
@@ -100,8 +99,8 @@ const Button: React.FC<ButtonProps> = ({
     >
       {to ? (
         <Link to={to}>
-           {finalIcon && (
-            typeof finalIcon === 'string' ? (
+          {finalIcon &&
+            (typeof finalIcon === 'string' ? (
               <div
                 className="w-4 h-4 bg-cover bg-center rounded-sm mr-2"
                 style={{ backgroundImage: `url(${finalIcon})` }}
@@ -110,16 +109,15 @@ const Button: React.FC<ButtonProps> = ({
               <FontAwesomeIcon
                 icon={inProgress ? faSpinner : finalIcon}
                 spin={inProgress}
-                className={cn("mr-2 h-4 w-4", reverse && "mr-0 ml-2")}
+                className={cn('mr-2 h-4 w-4', reverse && 'mr-0 ml-2')}
               />
-            )
-          )}
+            ))}
           {finalChildren}
         </Link>
       ) : href ? (
         <a href={href} target="_blank" rel="noopener noreferrer">
-           {finalIcon && (
-            typeof finalIcon === 'string' ? (
+          {finalIcon &&
+            (typeof finalIcon === 'string' ? (
               <div
                 className="w-4 h-4 bg-cover bg-center rounded-sm mr-2"
                 style={{ backgroundImage: `url(${finalIcon})` }}
@@ -128,16 +126,15 @@ const Button: React.FC<ButtonProps> = ({
               <FontAwesomeIcon
                 icon={inProgress ? faSpinner : finalIcon}
                 spin={inProgress}
-                className={cn("mr-2 h-4 w-4", reverse && "mr-0 ml-2")}
+                className={cn('mr-2 h-4 w-4', reverse && 'mr-0 ml-2')}
               />
-            )
-          )}
+            ))}
           {finalChildren}
         </a>
       ) : (
         <>
-          {finalIcon && (
-            typeof finalIcon === 'string' ? (
+          {finalIcon &&
+            (typeof finalIcon === 'string' ? (
               <div
                 className="w-4 h-4 bg-cover bg-center rounded-sm mr-2"
                 style={{ backgroundImage: `url(${finalIcon})` }}
@@ -146,10 +143,9 @@ const Button: React.FC<ButtonProps> = ({
               <FontAwesomeIcon
                 icon={inProgress ? faSpinner : finalIcon}
                 spin={inProgress}
-                className={cn("mr-2 h-4 w-4", reverse && "mr-0 ml-2")}
+                className={cn('mr-2 h-4 w-4', reverse && 'mr-0 ml-2')}
               />
-            )
-          )}
+            ))}
           {finalChildren}
         </>
       )}

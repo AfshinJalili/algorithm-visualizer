@@ -12,9 +12,8 @@ import {
   faTrashAlt,
   faSave,
   faStar,
-  faShareAlt, // Using a generic share icon instead of Facebook specific if preferred, or keep faFacebook
 } from '@fortawesome/free-solid-svg-icons';
-import { faGithub, faFacebook } from '@fortawesome/free-brands-svg-icons';
+import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { GitHubApi } from 'apis';
 import { refineGist } from 'common/util';
 import { languages } from 'common/config';
@@ -32,11 +31,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "components/ui/dropdown-menu";
-import { Input } from "components/ui/input";
-import Ellipsis from 'components/Ellipsis';
+} from 'components/ui/dropdown-menu';
+import { Input } from 'components/ui/input';
 import Player from 'components/Player';
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 
 interface HeaderProps {
   className?: string;
@@ -187,10 +185,10 @@ const Header: React.FC<HeaderProps> = ({
   const permitted = hasPermission();
 
   return (
-    <header className={cn("flex flex-col min-w-0 bg-background text-foreground", className)}>
+    <header className={cn('flex flex-col min-w-0 bg-background text-foreground', className)}>
       <div className="flex justify-between px-3 py-1.5 border-b border-border gap-3 items-center h-10">
         <div className="flex items-center gap-2 min-w-0 flex-shrink">
-          <Button 
+          <Button
             variant="ghost"
             size="sm"
             className="font-semibold text-sm px-2 h-7 hover:bg-accent hover:text-accent-foreground min-w-0"
@@ -230,22 +228,25 @@ const Header: React.FC<HeaderProps> = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="sm" className="gap-1 h-7 px-2 text-xs">
-                  <img
-                    src={user.avatar_url}
-                    alt={user.login}
-                    className="w-3.5 h-3.5 rounded-sm"
-                  />
+                  <img src={user.avatar_url} alt={user.login} className="w-3.5 h-3.5 rounded-sm" />
                   <span className="font-medium">{user.login}</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start">
                 <DropdownMenuItem asChild>
-                  <a href="/api/auth/destroy" rel="opener">Sign Out</a>
+                  <a href="/api/auth/destroy" rel="opener">
+                    Sign Out
+                  </a>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button variant="default" size="sm" className="h-7 px-2 gap-1 text-xs" href="/api/auth/request">
+            <Button
+              variant="default"
+              size="sm"
+              className="h-7 px-2 gap-1 text-xs"
+              href="/api/auth/request"
+            >
               <FontAwesomeIcon icon={faGithub} className="h-3 w-3" />
               <span>Sign In</span>
             </Button>
@@ -255,13 +256,15 @@ const Header: React.FC<HeaderProps> = ({
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="sm" className="gap-1 h-7 px-2 text-xs">
                 <FontAwesomeIcon icon={faStar} className="text-yellow-500 h-3 w-3" />
-                <span className="font-medium">{languages.find(language => language.ext === ext)?.name}</span>
+                <span className="font-medium">
+                  {languages.find(language => language.ext === ext)?.name}
+                </span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               {languages.map(language =>
                 language.ext === ext ? null : (
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     key={language.ext}
                     onClick={() => dispatch(setExt(language.ext))}
                   >
@@ -287,7 +290,7 @@ const Header: React.FC<HeaderProps> = ({
             <FontAwesomeIcon icon={permitted ? faSave : faCodeBranch} className="h-3.5 w-3.5" />
           </Button>
           {permitted && (
-            <Button 
+            <Button
               variant="destructive"
               size="sm"
               className="h-7 w-7 p-0"
