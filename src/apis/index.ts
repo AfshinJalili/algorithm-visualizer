@@ -1,63 +1,63 @@
 import Promise from 'bluebird';
-import axios from 'axios';
+import axios, { CancelToken } from 'axios';
 
 axios.interceptors.response.use(response => response.data);
 
-const request = (url, process) => {
+const request = (url: string, process: (mappedURL: string, args: any[]) => Promise<any>) => {
   const tokens = url.split('/');
   const baseURL = /^https?:\/\//i.test(url) ? '' : '/api';
-  return (...args) => {
-    const mappedURL = baseURL + tokens.map((token, i) => token.startsWith(':') ? args.shift() : token).join('/');
+  return (...args: any[]) => {
+    const mappedURL = baseURL + tokens.map(token => token.startsWith(':') ? args.shift() : token).join('/');
     return Promise.resolve(process(mappedURL, args));
   };
 };
 
-const GET = URL => {
+const GET = (URL: string) => {
   return request(URL, (mappedURL, args) => {
     const [params, cancelToken] = args;
     return axios.get(mappedURL, { params, cancelToken });
   });
 };
 
-const DELETE = URL => {
+const DELETE = (URL: string) => {
   return request(URL, (mappedURL, args) => {
     const [params, cancelToken] = args;
     return axios.delete(mappedURL, { params, cancelToken });
   });
 };
 
-const POST = URL => {
+const POST = (URL: string) => {
   return request(URL, (mappedURL, args) => {
     const [body, params, cancelToken] = args;
     return axios.post(mappedURL, body, { params, cancelToken });
   });
 };
 
-const PUT = URL => {
+const PUT = (URL: string) => {
   return request(URL, (mappedURL, args) => {
     const [body, params, cancelToken] = args;
     return axios.put(mappedURL, body, { params, cancelToken });
   });
 };
 
-const PATCH = URL => {
+const PATCH = (URL: string) => {
   return request(URL, (mappedURL, args) => {
     const [body, params, cancelToken] = args;
     return axios.patch(mappedURL, body, { params, cancelToken });
   });
 };
 
-const AlgorithmApi = {
+export const AlgorithmApi = {
   getCategories: GET('/algorithms'),
   getAlgorithm: GET('/algorithms/:categoryKey/:algorithmKey'),
 };
 
-const VisualizationApi = {
+export const VisualizationApi = {
   getVisualization: GET('/visualizations/:visualizationId'),
 };
 
-const GitHubApi = {
-  auth: token => Promise.resolve(axios.defaults.headers.common['Authorization'] = token && `token ${token}`),
+export const GitHubApi = {
+  auth: (token?: string) => Promise.resolve(axios.defaults.headers.common['Authorization'] = token && `token ${token}`),
   getUser: GET('https://api.github.com/user'),
   listGists: GET('https://api.github.com/gists'),
   createGist: POST('https://api.github.com/gists'),
@@ -67,8 +67,8 @@ const GitHubApi = {
   forkGist: POST('https://api.github.com/gists/:id/forks'),
 };
 
-const TracerApi = {
-  md: ({ code }) => Promise.resolve([{
+export const TracerApi = {
+  md: ({ code }: { code: string }) => Promise.resolve([{
     key: 'markdown',
     method: 'MarkdownTracer',
     args: ['Markdown'],
@@ -81,8 +81,8 @@ const TracerApi = {
     method: 'setRoot',
     args: ['markdown'],
   }]),
-  json: ({ code }) => new Promise(resolve => resolve(JSON.parse(code))),
-  js: ({ code }, params, cancelToken) => new Promise(async (resolve, reject) => {
+  json: ({ code }: { code: string }) => new Promise(resolve => resolve(JSON.parse(code))),
+  js: ({ code }: { code: string }, params?: any, cancelToken?: CancelToken) => new Promise(async (resolve, reject) => {
     try {
       const libResponse = await fetch('/api/tracers/js');
       const libText = await libResponse.text();
@@ -132,11 +132,4 @@ onmessage = e => {
   }),
   cpp: POST('/tracers/cpp'),
   java: POST('/tracers/java'),
-};
-
-export {
-  AlgorithmApi,
-  VisualizationApi,
-  GitHubApi,
-  TracerApi,
 };
