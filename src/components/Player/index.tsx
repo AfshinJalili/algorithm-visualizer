@@ -130,9 +130,12 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
   }, [cursor, isValidCursor, pause, dispatch]);
 
   const play = useCallback(() => {
+    if (cursor >= chunks.length) {
+      dispatch(setCursor(1));
+    }
     playingRef.current = true;
     setPlaying(true);
-  }, []);
+  }, [cursor, chunks.length, dispatch]);
 
   useEffect(() => {
     if (!playing) return;
