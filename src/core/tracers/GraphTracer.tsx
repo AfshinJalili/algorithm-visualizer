@@ -1,14 +1,59 @@
-import { Tracer } from 'core/tracers';
+import Tracer from './Tracer';
 import { distance } from 'common/util';
 import { GraphRenderer } from 'core/renderers';
 
+interface Dimensions {
+  baseWidth: number;
+  baseHeight: number;
+  padding: number;
+  nodeRadius: number;
+  arrowGap: number;
+  nodeWeightGap: number;
+  edgeWeightGap: number;
+}
+
+interface Node {
+  id: number;
+  weight: number | null;
+  x: number;
+  y: number;
+  visitedCount: number;
+  selectedCount: number;
+}
+
+interface Edge {
+  source: number;
+  target: number;
+  weight: number | null;
+  visitedCount: number;
+  selectedCount: number;
+}
+
 class GraphTracer extends Tracer {
+  dimensions: Dimensions = {
+    baseWidth: 320,
+    baseHeight: 320,
+    padding: 32,
+    nodeRadius: 12,
+    arrowGap: 4,
+    nodeWeightGap: 4,
+    edgeWeightGap: 4,
+  };
+  isDirected: boolean = true;
+  isWeighted: boolean = false;
+  callLayout: { method: Function; args: any } = { method: this.layoutCircle, args: [] };
+  logTracer: any = null;
+  nodes: Node[] = [];
+  edges: Edge[] = [];
+
   getRendererClass() {
     return GraphRenderer;
   }
 
   init() {
     super.init();
+    this.nodes = [];
+    this.edges = [];
     this.dimensions = {
       baseWidth: 320,
       baseHeight: 320,
@@ -24,7 +69,7 @@ class GraphTracer extends Tracer {
     this.logTracer = null;
   }
 
-  set(array2d = []) {
+  set(array2d: any[][] = []) {
     this.nodes = [];
     this.edges = [];
     for (let i = 0; i < array2d.length; i++) {
@@ -40,30 +85,30 @@ class GraphTracer extends Tracer {
     super.set();
   }
 
-  directed(isDirected = true) {
+  directed(isDirected: boolean = true) {
     this.isDirected = isDirected;
   }
 
-  weighted(isWeighted = true) {
+  weighted(isWeighted: boolean = true) {
     this.isWeighted = isWeighted;
   }
 
-  addNode(id, weight = null, x = 0, y = 0, visitedCount = 0, selectedCount = 0) {
+  addNode(id: number, weight: number | null = null, x: number = 0, y: number = 0, visitedCount: number = 0, selectedCount: number = 0) {
     if (this.findNode(id)) return;
     this.nodes.push({ id, weight, x, y, visitedCount, selectedCount });
     this.layout();
   }
 
-  updateNode(id, weight, x, y, visitedCount, selectedCount) {
+  updateNode(id: number, weight?: number, x?: number, y?: number, visitedCount?: number, selectedCount?: number) {
     const node = this.findNode(id);
-    const update = { weight, x, y, visitedCount, selectedCount };
+    const update: any = { weight, x, y, visitedCount, selectedCount };
     Object.keys(update).forEach(key => {
       if (update[key] === undefined) delete update[key];
     });
     Object.assign(node, update);
   }
 
-  removeNode(id) {
+  removeNode(id: number) {
     const node = this.findNode(id);
     if (!node) return;
     const index = this.nodes.indexOf(node);
@@ -71,22 +116,22 @@ class GraphTracer extends Tracer {
     this.layout();
   }
 
-  addEdge(source, target, weight = null, visitedCount = 0, selectedCount = 0) {
+  addEdge(source: number, target: number, weight: number | null = null, visitedCount: number = 0, selectedCount: number = 0) {
     if (this.findEdge(source, target)) return;
     this.edges.push({ source, target, weight, visitedCount, selectedCount });
     this.layout();
   }
 
-  updateEdge(source, target, weight, visitedCount, selectedCount) {
+  updateEdge(source: number, target: number, weight?: number, visitedCount?: number, selectedCount?: number) {
     const edge = this.findEdge(source, target);
-    const update = { weight, visitedCount, selectedCount };
+    const update: any = { weight, visitedCount, selectedCount };
     Object.keys(update).forEach(key => {
       if (update[key] === undefined) delete update[key];
     });
     Object.assign(edge, update);
   }
 
-  removeEdge(source, target) {
+  removeEdge(source: number, target: number) {
     const edge = this.findEdge(source, target);
     if (!edge) return;
     const index = this.edges.indexOf(edge);
@@ -94,11 +139,11 @@ class GraphTracer extends Tracer {
     this.layout();
   }
 
-  findNode(id) {
+  findNode(id: number): Node | undefined {
     return this.nodes.find(node => node.id === id);
   }
 
-  findEdge(source, target, isDirected = this.isDirected) {
+  findEdge(source: number, target: number, isDirected: boolean = this.isDirected): Edge | undefined {
     if (isDirected) {
       return this.edges.find(edge => edge.source === source && edge.target === target);
     } else {
@@ -108,7 +153,7 @@ class GraphTracer extends Tracer {
     }
   }
 
-  findLinkedEdges(source, isDirected = this.isDirected) {
+  findLinkedEdges(source: number, isDirected: boolean = this.isDirected): Edge[] {
     if (isDirected) {
       return this.edges.filter(edge => edge.source === source);
     } else {
@@ -116,12 +161,12 @@ class GraphTracer extends Tracer {
     }
   }
 
-  findLinkedNodeIds(source, isDirected = this.isDirected) {
+  findLinkedNodeIds(source: number, isDirected: boolean = this.isDirected): number[] {
     const edges = this.findLinkedEdges(source, isDirected);
     return edges.map(edge => edge.source === source ? edge.target : edge.source);
   }
 
-  findLinkedNodes(source, isDirected = this.isDirected) {
+  findLinkedNodes(source: number, isDirected: boolean = this.isDirected): (Node | undefined)[] {
     const ids = this.findLinkedNodeIds(source, isDirected);
     return ids.map(id => this.findNode(id));
   }
@@ -156,7 +201,7 @@ class GraphTracer extends Tracer {
     }
   }
 
-  layoutTree(root = 0, sorted = false) {
+  layoutTree(root: number = 0, sorted: boolean = false) {
     this.callLayout = { method: this.layoutTree, args: arguments };
     const rect = this.getRect();
 
@@ -168,9 +213,9 @@ class GraphTracer extends Tracer {
     }
 
     let maxDepth = 0;
-    const leafCounts = {};
-    let marked = {};
-    const recursiveAnalyze = (id, depth) => {
+    const leafCounts: Record<number, number> = {};
+    let marked: Record<number, boolean> = {};
+    const recursiveAnalyze = (id: number, depth: number): number => {
       marked[id] = true;
       leafCounts[id] = 0;
       if (maxDepth < depth) maxDepth = depth;
@@ -187,11 +232,11 @@ class GraphTracer extends Tracer {
     const hGap = rect.width / leafCounts[root];
     const vGap = rect.height / maxDepth;
     marked = {};
-    const recursivePosition = (node, h, v) => {
+    const recursivePosition = (node: Node, h: number, v: number) => {
       marked[node.id] = true;
       node.x = rect.left + (h + leafCounts[node.id] / 2) * hGap;
       node.y = rect.top + v * vGap;
-      const linkedNodes = this.findLinkedNodes(node.id, false);
+      const linkedNodes = this.findLinkedNodes(node.id, false).filter((n): n is Node => n !== undefined);
       if (sorted) linkedNodes.sort((a, b) => a.id - b.id);
       for (const linkedNode of linkedNodes) {
         if (marked[linkedNode.id]) continue;
@@ -200,13 +245,13 @@ class GraphTracer extends Tracer {
       }
     };
     const rootNode = this.findNode(root);
-    recursivePosition(rootNode, 0, 0);
+    if (rootNode) recursivePosition(rootNode, 0, 0);
   }
 
   layoutRandom() {
     this.callLayout = { method: this.layoutRandom, args: arguments };
     const rect = this.getRect();
-    const placedNodes = [];
+    const placedNodes: Node[] = [];
     for (const node of this.nodes) {
       do {
         node.x = rect.left + Math.random() * rect.width;
@@ -216,46 +261,49 @@ class GraphTracer extends Tracer {
     }
   }
 
-  visit(target, source, weight) {
+  visit(target: number, source?: number, weight?: number) {
     this.visitOrLeave(true, target, source, weight);
   }
 
-  leave(target, source, weight) {
+  leave(target: number, source?: number, weight?: number) {
     this.visitOrLeave(false, target, source, weight);
   }
 
-  visitOrLeave(visit, target, source = null, weight) {
-    const edge = this.findEdge(source, target);
+  visitOrLeave(visit: boolean, target: number, source: number | null = null, weight?: number) {
+    const edge = this.findEdge(source!, target);
     if (edge) edge.visitedCount += visit ? 1 : -1;
     const node = this.findNode(target);
-    if (weight !== undefined) node.weight = weight;
-    node.visitedCount += visit ? 1 : -1;
+    if (node) {
+      if (weight !== undefined) node.weight = weight;
+      node.visitedCount += visit ? 1 : -1;
+    }
     if (this.logTracer) {
       this.logTracer.println(visit ? (source || '') + ' -> ' + target : (source || '') + ' <- ' + target);
     }
   }
 
-  select(target, source) {
+  select(target: number, source?: number) {
     this.selectOrDeselect(true, target, source);
   }
 
-  deselect(target, source) {
+  deselect(target: number, source?: number) {
     this.selectOrDeselect(false, target, source);
   }
 
-  selectOrDeselect(select, target, source = null) {
-    const edge = this.findEdge(source, target);
+  selectOrDeselect(select: boolean, target: number, source: number | null = null) {
+    const edge = this.findEdge(source!, target);
     if (edge) edge.selectedCount += select ? 1 : -1;
     const node = this.findNode(target);
-    node.selectedCount += select ? 1 : -1;
+    if (node) node.selectedCount += select ? 1 : -1;
     if (this.logTracer) {
       this.logTracer.println(select ? (source || '') + ' => ' + target : (source || '') + ' <= ' + target);
     }
   }
 
-  log(key) {
+  log(key: string) {
     this.logTracer = key ? this.getObject(key) : null;
   }
 }
 
 export default GraphTracer;
+

@@ -1,4 +1,4 @@
-import { Array1DTracer } from 'core/tracers';
+import Array1DTracer from './Array1DTracer';
 import { ChartRenderer } from 'core/renderers';
 
 class ChartTracer extends Array1DTracer {
@@ -8,3 +8,4 @@ class ChartTracer extends Array1DTracer {
 }
 
 export default ChartTracer;
+

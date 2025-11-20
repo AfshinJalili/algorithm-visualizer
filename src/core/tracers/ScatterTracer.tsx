@@ -1,4 +1,4 @@
-import { Array2DTracer } from 'core/tracers';
+import Array2DTracer from './Array2DTracer';
 import { ScatterRenderer } from 'core/renderers';
 
 class ScatterTracer extends Array2DTracer {
@@ -8,3 +8,4 @@ class ScatterTracer extends Array2DTracer {
 }
 
 export default ScatterTracer;
+
