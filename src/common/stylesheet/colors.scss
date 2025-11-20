@@ -1,14 +1,14 @@
-$theme-dark: #242424;
-$theme-normal: #393939;
-$theme-light: #505050;
-$color-font: #bbbbbb;
-$color-shadow: rgba(#000000, 0.2);
-$color-overlay: rgba(#ffffff, 0.1);
-$color-alert: #f3bd58;
-$color-selected: #2962ff;
+$theme-dark: #1e1e1e;
+$theme-normal: #252526;
+$theme-light: #333333;
+$color-font: #e0e0e0;
+$color-shadow: rgba(0, 0, 0, 0.3);
+$color-overlay: rgba(255, 255, 255, 0.08);
+$color-alert: #fab1a0;
+$color-selected: #0984e3;
 $color-patched: #c51162;
 $color-highlight: #29d;
-$color-active: #00e676;
+$color-active: #4caf50;
 
 :export {
   themeDark: $theme-dark;
