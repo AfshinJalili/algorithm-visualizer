@@ -98,7 +98,7 @@ const App: React.FC = () => {
           if (!saved) return false as never;
         });
       } else {
-        window.onbeforeunload = undefined;
+        window.onbeforeunload = null;
         if (unblockRef.current) {
           unblockRef.current();
           unblockRef.current = undefined;
@@ -323,7 +323,7 @@ const App: React.FC = () => {
         </ErrorBoundary>
         <ErrorBoundary
           level="feature"
-          resetKeys={[params.algorithmKey, params.gistId]}
+          resetKeys={[params.algorithmKey ?? '', params.gistId ?? '']}
           onError={error => dispatch(showErrorToast(error.message))}
         >
           <VisualizationViewer className="flex-1 flex flex-col min-h-0 min-w-0" />

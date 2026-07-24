@@ -22,7 +22,7 @@ interface Edge {
 }
 
 class GraphRenderer extends Renderer<GraphTracer> {
-  elementRef: React.RefObject<SVGSVGElement>;
+  elementRef: React.RefObject<SVGSVGElement | null>;
   selectedNode: Node | null;
 
   constructor(props: { className?: string; title: string; data: GraphTracer }) {
@@ -48,6 +48,7 @@ class GraphRenderer extends Renderer<GraphTracer> {
       if (this.selectedNode) {
         const { x, y } = this.computeCoords(e);
         const node = this.props.data.findNode(this.selectedNode.id);
+        if (!node) return;
         node.x = x;
         node.y = y;
         this.refresh();
@@ -129,8 +130,8 @@ class GraphRenderer extends Renderer<GraphTracer> {
               <g
                 className={classes(
                   styles.edge,
-                  selectedCount && styles.selected,
-                  visitedCount && styles.visited
+                  !!selectedCount && styles.selected,
+                  !!visitedCount && styles.visited
                 )}
                 key={`${source}-${target}`}
               >
@@ -158,8 +159,8 @@ class GraphRenderer extends Renderer<GraphTracer> {
             <g
               className={classes(
                 styles.node,
-                selectedCount && styles.selected,
-                visitedCount && styles.visited
+                !!selectedCount && styles.selected,
+                !!visitedCount && styles.visited
               )}
               key={id}
               transform={`translate(${x},${y})`}

@@ -4,7 +4,7 @@ import styles from './LogRenderer.module.scss';
 import type LogTracer from 'core/tracers/LogTracer';
 
 class LogRenderer extends Renderer<LogTracer> {
-  elementRef: React.RefObject<HTMLDivElement>;
+  elementRef: React.RefObject<HTMLDivElement | null>;
 
   constructor(props: { className?: string; title: string; data: LogTracer }) {
     super(props);
