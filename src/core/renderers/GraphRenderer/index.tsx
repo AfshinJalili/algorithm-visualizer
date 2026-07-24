@@ -59,11 +59,14 @@ class GraphRenderer extends Renderer<GraphTracer> {
   }
 
   computeCoords(e: React.MouseEvent | MouseEvent): { x: number; y: number } {
-    const svg = this.elementRef.current!;
+    const svg = this.elementRef.current;
+    if (!svg) return { x: 0, y: 0 };
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return { x: 0, y: 0 };
     const s = svg.createSVGPoint();
     s.x = e.clientX;
     s.y = e.clientY;
-    const { x, y } = s.matrixTransform(svg.getScreenCTM()!.inverse());
+    const { x, y } = s.matrixTransform(ctm.inverse());
     return { x, y };
   }
 

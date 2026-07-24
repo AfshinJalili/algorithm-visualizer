@@ -265,7 +265,9 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
           max={chunks.length || 1}
           step={1}
           value={[cursor]}
-          onValueChange={vals => handleChangeProgress(vals[0] / (chunks.length || 1))}
+          onValueChange={vals =>
+            handleChangeProgress((vals[0] ?? 0) / (chunks.length || 1))
+          }
           className="w-32"
         />
         <span className="text-xs text-muted-foreground whitespace-nowrap">
@@ -280,7 +282,7 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
           max={4}
           step={0.5}
           value={[speed]}
-          onValueChange={vals => setSpeed(vals[0])}
+          onValueChange={vals => setSpeed(vals[0] ?? speed)}
           className="w-24"
         />
       </div>
