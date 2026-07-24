@@ -18,7 +18,7 @@ class ScatterRenderer extends Array2DRenderer {
     const datasets = data.map((series: Element[], index: number) => ({
       backgroundColor: colors[index],
       data: series.map(s => convertToObjectArray(s.value)),
-      label: Math.random(),
+      label: String(Math.random()),
       radius: (index + 1) * 2,
     }));
 

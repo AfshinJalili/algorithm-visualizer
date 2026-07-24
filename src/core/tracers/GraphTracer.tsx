@@ -80,7 +80,7 @@ class GraphTracer extends Tracer {
       for (let j = 0; j < array2d.length; j++) {
         const value = array2d[i][j];
         if (value) {
-          this.addEdge(i, j, this.isWeighted ? value : null);
+          this.addEdge(i, j, this.isWeighted ? (value as number) : null);
         }
       }
     }
@@ -347,7 +347,7 @@ class GraphTracer extends Tracer {
   }
 
   log(key: string) {
-    this.logTracer = key ? this.getObject(key) : null;
+    this.logTracer = key ? (this.getObject(key) as LogTracer | undefined) || null : null;
   }
 }
 

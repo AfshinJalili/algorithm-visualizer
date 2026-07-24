@@ -15,7 +15,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { GitHubApi } from 'apis';
-import { refineGist } from 'common/util';
+import { refineGist, Gist as ApiGist } from 'common/util';
 import { languages } from 'common/config';
 import { useAppSelector, useAppDispatch } from '../../store';
 import {
@@ -25,6 +25,7 @@ import {
   setExt,
   showErrorToast,
 } from '../../reducers';
+import { ScratchPaperDetail } from '../../types';
 import { Button } from 'components/ui/button';
 import {
   DropdownMenu,
@@ -93,25 +94,12 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const saveGist = () => {
-    // ... (Gist logic remains identical)
-    interface GistFile {
-      content?: string;
-    }
-    interface Gist {
+    interface GistPayload {
       description: string;
-      files: Record<string, GistFile | null>;
-    }
-    interface GistResponse {
-      id: string;
-      [key: string]: unknown;
-    }
-    interface ScratchPaper {
-      gistId: string;
-      files: { name: string; [key: string]: unknown }[];
-      [key: string]: unknown;
+      files: Record<string, { content?: string } | null>;
     }
 
-    const gist: Gist = {
+    const gist: GistPayload = {
       description: titles[titles.length - 1],
       files: {},
     };
@@ -128,27 +116,25 @@ const Header: React.FC<HeaderProps> = ({
     gist.files['algorithm-visualizer'] = {
       content: 'https://algorithm-visualizer.org/',
     };
-    const save = (g: Gist): Promise<GistResponse> => {
+    const save = (g: GistPayload): Promise<ApiGist> => {
       if (!user) return Promise.reject(new Error('Sign In Required'));
       if (scratchPaper && scratchPaper.login) {
         if (scratchPaper.login === user.login) {
-          return GitHubApi.editGist(scratchPaper.gistId, g) as Promise<GistResponse>;
+          return GitHubApi.editGist(scratchPaper.gistId, g) as unknown as Promise<ApiGist>;
         } else {
-          return GitHubApi.forkGist(scratchPaper.gistId).then((forkedGist: GistResponse) =>
+          return GitHubApi.forkGist(scratchPaper.gistId).then(forkedGist =>
             GitHubApi.editGist(forkedGist.id, g)
-          ) as Promise<GistResponse>;
+          ) as unknown as Promise<ApiGist>;
         }
       }
-      return GitHubApi.createGist(g) as Promise<GistResponse>;
+      return GitHubApi.createGist(g) as unknown as Promise<ApiGist>;
     };
     save(gist)
       .then(refineGist)
-      .then((newScratchPaper: ScratchPaper) => {
+      .then((newScratchPaper: ScratchPaperDetail) => {
         dispatch(setScratchPaper(newScratchPaper));
         dispatch(
-          setEditingFile(
-            newScratchPaper.files.find((file: { name: string }) => file.name === editingFile?.name)
-          )
+          setEditingFile(newScratchPaper.files.find(file => file.name === editingFile?.name))
         );
         if (!(scratchPaper && scratchPaper.gistId === newScratchPaper.gistId)) {
           navigate(`/scratch-paper/${newScratchPaper.gistId}`);

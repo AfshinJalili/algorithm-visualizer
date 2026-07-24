@@ -33,26 +33,28 @@ class GraphRenderer extends Renderer<GraphTracer> {
 
     this.togglePan(true);
     this.toggleZoom(true);
-  }
 
-  handleMouseDown(e: React.MouseEvent) {
-    super.handleMouseDown && super.handleMouseDown(e);
-    const coords = this.computeCoords(e);
-    const { nodes, dimensions } = this.props.data;
-    const { nodeRadius } = dimensions;
-    this.selectedNode = nodes.find((node: Node) => distance(coords, node) <= nodeRadius) || null;
-  }
+    const baseDown = this.handleMouseDown;
+    this.handleMouseDown = (e: React.MouseEvent) => {
+      baseDown?.(e);
+      const coords = this.computeCoords(e);
+      const { nodes, dimensions } = this.props.data;
+      const { nodeRadius } = dimensions;
+      this.selectedNode = nodes.find((node: Node) => distance(coords, node) <= nodeRadius) || null;
+    };
 
-  handleMouseMove(e: MouseEvent) {
-    if (this.selectedNode) {
-      const { x, y } = this.computeCoords(e);
-      const node = this.props.data.findNode(this.selectedNode.id);
-      node.x = x;
-      node.y = y;
-      this.refresh();
-    } else {
-      super.handleMouseMove && super.handleMouseMove(e);
-    }
+    const baseMove = this.handleMouseMove;
+    this.handleMouseMove = (e: MouseEvent) => {
+      if (this.selectedNode) {
+        const { x, y } = this.computeCoords(e);
+        const node = this.props.data.findNode(this.selectedNode.id);
+        node.x = x;
+        node.y = y;
+        this.refresh();
+      } else {
+        baseMove(e);
+      }
+    };
   }
 
   computeCoords(e: React.MouseEvent | MouseEvent): { x: number; y: number } {

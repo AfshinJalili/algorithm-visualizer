@@ -28,10 +28,37 @@ export interface EnvState {
   ext: string;
 }
 
+export interface Command {
+  key: string | null;
+  method: string;
+  args: unknown[];
+}
+
+export interface Chunk {
+  commands: Command[];
+  lineNumber?: number;
+}
+
 export interface PlayerState {
-  chunks: unknown[];
+  chunks: Chunk[];
   cursor: number;
   lineIndicator?: { lineNumber: number; cursor: number } | null;
+}
+
+export interface AlgorithmDetail {
+  categoryKey: string;
+  categoryName: string;
+  algorithmKey: string;
+  algorithmName: string;
+  files: File[];
+  description: string;
+}
+
+export interface ScratchPaperDetail {
+  login: string;
+  gistId: string;
+  title: string;
+  files: File[];
 }
 
 export interface ToastState {

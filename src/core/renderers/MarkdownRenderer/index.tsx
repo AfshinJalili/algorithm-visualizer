@@ -44,7 +44,9 @@ class MarkdownRenderer extends Renderer<MarkdownTracer> {
             if (!child) return '';
             if (typeof child === 'string') return child;
             if (typeof child === 'object' && 'props' in child)
-              return getText((child as React.ReactElement).props.children);
+              return getText(
+                (child as React.ReactElement<{ children?: React.ReactNode }>).props.children
+              );
             return '';
           })?.join('') || ''
         );
@@ -86,7 +88,7 @@ class MarkdownRenderer extends Renderer<MarkdownTracer> {
 
     return (
       <div className={styles.markdown}>
-        <ReactMarkdown className={styles.content} components={{ heading, link, image }}>
+        <ReactMarkdown className={styles.content} components={{ heading, link, image } as never}>
           {markdown}
         </ReactMarkdown>
       </div>

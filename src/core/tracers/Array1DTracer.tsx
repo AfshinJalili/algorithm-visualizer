@@ -37,7 +37,7 @@ class Array1DTracer extends Array2DTracer {
   }
 
   chart(key: string) {
-    this.chartTracer = key ? this.getObject(key) : null;
+    this.chartTracer = key ? (this.getObject(key) as ChartTracer | undefined) || null : null;
     this.syncChartTracer();
   }
 
