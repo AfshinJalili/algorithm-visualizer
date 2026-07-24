@@ -3,7 +3,7 @@ import Tracer from './Tracer';
 import { LogRenderer } from 'core/renderers';
 
 class LogTracer extends Tracer {
-  log: string;
+  log: string = '';
 
   getRendererClass() {
     return LogRenderer;

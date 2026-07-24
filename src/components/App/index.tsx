@@ -27,12 +27,13 @@ import {
 import { createUserFile, extension, refineGist } from 'common/util';
 import { exts, languages } from 'common/config';
 import { SCRATCH_PAPER_README_MD } from 'files';
+import { AlgorithmDetail, ScratchPaperDetail } from '../../types';
 
 declare global {
   interface Window {
     signIn?: (token: string) => void;
     signOut?: () => void;
-    __PRELOADED_ALGORITHM__?: unknown;
+    __PRELOADED_ALGORITHM__?: AlgorithmDetail | null;
   }
 }
 
@@ -97,7 +98,7 @@ const App: React.FC = () => {
           if (!saved) return false as never;
         });
       } else {
-        window.onbeforeunload = undefined;
+        window.onbeforeunload = null;
         if (unblockRef.current) {
           unblockRef.current();
           unblockRef.current = undefined;
@@ -188,7 +189,7 @@ const App: React.FC = () => {
     ) => {
       const { categoryKey, algorithmKey, gistId } = params;
       const { visualizationId } = query;
-      const fetch = () => {
+      const fetch = (): Promise<void> => {
         if (window.__PRELOADED_ALGORITHM__) {
           dispatch(setAlgorithm(window.__PRELOADED_ALGORITHM__));
           delete window.__PRELOADED_ALGORITHM__;
@@ -197,7 +198,9 @@ const App: React.FC = () => {
           return Promise.reject(new Error('Algorithm Not Found'));
         } else if (categoryKey && algorithmKey) {
           return AlgorithmApi.getAlgorithm(categoryKey, algorithmKey).then(
-            ({ algorithm }: { algorithm: unknown }) => dispatch(setAlgorithm(algorithm as never))
+            ({ algorithm }: { algorithm: AlgorithmDetail }) => {
+              dispatch(setAlgorithm(algorithm));
+            }
           );
         } else if (gistId === 'new' && visualizationId) {
           return VisualizationApi.getVisualization(visualizationId).then((content: string) => {
@@ -228,14 +231,16 @@ const App: React.FC = () => {
         } else if (gistId) {
           return GitHubApi.getGist(gistId, { timestamp: Date.now() })
             .then(refineGist)
-            .then((sp: unknown) => dispatch(setScratchPaper(sp as never)));
+            .then((sp: ScratchPaperDetail) => {
+              dispatch(setScratchPaper(sp));
+            });
         } else {
           dispatch(setHome());
         }
         return Promise.resolve();
       };
       fetch()
-        .then(() => {
+        .then((): null => {
           selectDefaultTab();
           return null;
         })
@@ -318,7 +323,7 @@ const App: React.FC = () => {
         </ErrorBoundary>
         <ErrorBoundary
           level="feature"
-          resetKeys={[params.algorithmKey, params.gistId]}
+          resetKeys={[params.algorithmKey ?? '', params.gistId ?? '']}
           onError={error => dispatch(showErrorToast(error.message))}
         >
           <VisualizationViewer className="flex-1 flex flex-col min-h-0 min-w-0" />

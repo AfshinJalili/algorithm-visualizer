@@ -25,7 +25,7 @@ class Renderer<T = unknown> extends React.Component<RendererProps<T>> {
   zoomMax: number;
   zoomMin: number;
 
-  constructor(props: RendererProps) {
+  constructor(props: RendererProps<T>) {
     super(props);
 
     this.handleMouseMove = this._handleMouseMove.bind(this);
@@ -101,7 +101,7 @@ class Renderer<T = unknown> extends React.Component<RendererProps<T>> {
       case 'boolean':
         return value ? 'T' : 'F';
       default:
-        return value;
+        return String(value ?? '');
     }
   }
 

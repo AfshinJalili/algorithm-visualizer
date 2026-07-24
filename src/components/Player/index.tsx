@@ -12,10 +12,10 @@ import { extension } from 'common/util';
 import { TracerApi } from 'apis';
 import { useAppSelector, useAppDispatch } from '../../store';
 import { setChunks, setCursor, setLineIndicator, showErrorToast } from '../../reducers';
-import { Button } from "components/ui/button";
-import { Slider } from "components/ui/slider";
-import { cn } from "@/lib/utils";
-import { File } from '../../types';
+import { Button } from 'components/ui/button';
+import { Slider } from 'components/ui/slider';
+import { cn } from '@/lib/utils';
+import { File, Chunk, Command } from '../../types';
 
 interface PlayerProps {
   className?: string;
@@ -32,7 +32,7 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
   const [playing, setPlaying] = useState(false);
   const [building, setBuilding] = useState(false);
 
-  const timerRef = useRef<number | undefined>();
+  const timerRef = useRef<number | undefined>(undefined);
   const tracerApiSourceRef = useRef<any>(null);
   const playingRef = useRef(false);
   const algorithmKeyRef = useRef<string>('');
@@ -59,7 +59,7 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
 
   const reset = useCallback(
     (commands: unknown[] = []) => {
-      const newChunks = [
+      const newChunks: Chunk[] = [
         {
           commands: [],
           lineNumber: undefined,
@@ -68,16 +68,16 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
       const commandsCopy = [...commands];
       while (commandsCopy.length) {
         const command = commandsCopy.shift()!;
-        const { key, method, args } = command as any;
+        const { key, method, args } = command as Command;
         if (key === null && method === 'delay') {
-          const [lineNumber] = args;
+          const [lineNumber] = args as [number];
           newChunks[newChunks.length - 1].lineNumber = lineNumber;
           newChunks.push({
             commands: [],
             lineNumber: undefined,
           });
         } else {
-          (newChunks[newChunks.length - 1].commands as any[]).push(command);
+          newChunks[newChunks.length - 1].commands.push(command as Command);
         }
       }
       dispatch(setChunks(newChunks));
@@ -215,7 +215,7 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
   }, []);
 
   return (
-    <div className={cn("flex items-center gap-1.5", className)}>
+    <div className={cn('flex items-center gap-1.5', className)}>
       <Button
         variant="default"
         size="sm"
@@ -226,12 +226,18 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
       >
         {building ? 'Building' : 'Build'}
       </Button>
-      
+
       <div className="flex items-center gap-0.5">
-        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" disabled={!isValidCursor(cursor - 1)} onClick={prev}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 w-7 p-0"
+          disabled={!isValidCursor(cursor - 1)}
+          onClick={prev}
+        >
           <FontAwesomeIcon icon={faChevronLeft} className="h-3 w-3" />
         </Button>
-        
+
         {playing ? (
           <Button variant="default" size="sm" className="h-7 w-7 p-0" onClick={pause}>
             <FontAwesomeIcon icon={faPause} className="h-3 w-3" />
@@ -242,7 +248,13 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
           </Button>
         )}
 
-        <Button variant="ghost" size="sm" className="h-7 w-7 p-0" disabled={!isValidCursor(cursor + 1)} onClick={next}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="h-7 w-7 p-0"
+          disabled={!isValidCursor(cursor + 1)}
+          onClick={next}
+        >
           <FontAwesomeIcon icon={faChevronRight} className="h-3 w-3" />
         </Button>
       </div>
@@ -253,10 +265,14 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
           max={chunks.length || 1}
           step={1}
           value={[cursor]}
-          onValueChange={(vals) => handleChangeProgress(vals[0] / (chunks.length || 1))}
+          onValueChange={vals =>
+            handleChangeProgress((vals[0] ?? 0) / (chunks.length || 1))
+          }
           className="w-32"
         />
-        <span className="text-xs text-muted-foreground whitespace-nowrap">{cursor} / {chunks.length}</span>
+        <span className="text-xs text-muted-foreground whitespace-nowrap">
+          {cursor} / {chunks.length}
+        </span>
       </div>
 
       <div className="flex items-center gap-2 flex-shrink-0 min-w-[140px]">
@@ -266,7 +282,7 @@ const Player: React.FC<PlayerProps> = ({ className }) => {
           max={4}
           step={0.5}
           value={[speed]}
-          onValueChange={(vals) => setSpeed(vals[0])}
+          onValueChange={vals => setSpeed(vals[0] ?? speed)}
           className="w-24"
         />
       </div>

@@ -3,18 +3,18 @@ import LogTracer from './LogTracer';
 
 describe('LogTracer', () => {
   it('should instantiate correctly', () => {
-    const tracer = new LogTracer('test', () => null, 'Test Log');
+    const tracer = new LogTracer('test', () => undefined, 'Test Log');
     expect(tracer).toBeDefined();
   });
 
   it('should set log content', () => {
-    const tracer = new LogTracer('test', () => null, 'Test Log');
+    const tracer = new LogTracer('test', () => undefined, 'Test Log');
     tracer.set('Initial log');
     expect(tracer.log).toBe('Initial log');
   });
 
   it('should print messages', () => {
-    const tracer = new LogTracer('test', () => null, 'Test Log');
+    const tracer = new LogTracer('test', () => undefined, 'Test Log');
     tracer.set('');
     tracer.print('Hello');
     tracer.print(' World');
@@ -22,7 +22,7 @@ describe('LogTracer', () => {
   });
 
   it('should println messages', () => {
-    const tracer = new LogTracer('test', () => null, 'Test Log');
+    const tracer = new LogTracer('test', () => undefined, 'Test Log');
     tracer.set('');
     tracer.println('Line 1');
     tracer.println('Line 2');

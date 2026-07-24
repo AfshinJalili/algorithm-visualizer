@@ -39,7 +39,7 @@ const Button: React.FC<ButtonProps> = ({
   ...rest
 }) => {
   const [confirming, setConfirming] = useState(false);
-  const timeoutRef = useRef<number | undefined>();
+  const timeoutRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     return () => {

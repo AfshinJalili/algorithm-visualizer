@@ -3,7 +3,7 @@ import { Array1DRenderer } from 'core/renderers';
 import type ChartTracer from './ChartTracer';
 
 class Array1DTracer extends Array2DTracer {
-  chartTracer: ChartTracer | null;
+  chartTracer: ChartTracer | null = null;
 
   getRendererClass() {
     return Array1DRenderer;
@@ -37,7 +37,7 @@ class Array1DTracer extends Array2DTracer {
   }
 
   chart(key: string) {
-    this.chartTracer = key ? this.getObject(key) : null;
+    this.chartTracer = key ? (this.getObject(key) as ChartTracer | undefined) || null : null;
     this.syncChartTracer();
   }
 

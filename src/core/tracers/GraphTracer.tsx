@@ -80,7 +80,7 @@ class GraphTracer extends Tracer {
       for (let j = 0; j < array2d.length; j++) {
         const value = array2d[i][j];
         if (value) {
-          this.addEdge(i, j, this.isWeighted ? value : null);
+          this.addEdge(i, j, this.isWeighted ? (value as number) : null);
         }
       }
     }
@@ -118,6 +118,7 @@ class GraphTracer extends Tracer {
     selectedCount?: number
   ) {
     const node = this.findNode(id);
+    if (!node) return;
     const update: Partial<Node> = { weight, x, y, visitedCount, selectedCount };
     Object.keys(update).forEach(key => {
       if (update[key as keyof Node] === undefined) delete update[key as keyof Node];
@@ -153,6 +154,7 @@ class GraphTracer extends Tracer {
     selectedCount?: number
   ) {
     const edge = this.findEdge(source, target);
+    if (!edge) return;
     const update: Partial<Omit<Edge, 'source' | 'target'>> = {
       weight,
       visitedCount,
@@ -242,7 +244,7 @@ class GraphTracer extends Tracer {
   }
 
   layoutTree(root: number = 0, sorted: boolean = false) {
-    this.callLayout = { method: this.layoutTree, args: [root, sorted] };
+    this.callLayout = { method: this.layoutTree as LayoutMethod, args: [root, sorted] };
     const rect = this.getRect();
 
     if (this.nodes.length === 1) {
@@ -347,7 +349,7 @@ class GraphTracer extends Tracer {
   }
 
   log(key: string) {
-    this.logTracer = key ? this.getObject(key) : null;
+    this.logTracer = key ? (this.getObject(key) as LogTracer | undefined) || null : null;
   }
 }
 

@@ -3,12 +3,12 @@ import Array2DTracer from './Array2DTracer';
 
 describe('Array2DTracer', () => {
   it('should instantiate correctly', () => {
-    const tracer = new Array2DTracer('test', () => null, 'Test Tracer');
+    const tracer = new Array2DTracer('test', () => undefined, 'Test Tracer');
     expect(tracer).toBeDefined();
   });
 
   it('should set 2D array data', () => {
-    const tracer = new Array2DTracer('test', () => null, 'Test Tracer');
+    const tracer = new Array2DTracer('test', () => undefined, 'Test Tracer');
     tracer.set([
       [1, 2],
       [3, 4],
@@ -19,7 +19,7 @@ describe('Array2DTracer', () => {
   });
 
   it('should patch values', () => {
-    const tracer = new Array2DTracer('test', () => null, 'Test Tracer');
+    const tracer = new Array2DTracer('test', () => undefined, 'Test Tracer');
     tracer.set([
       [1, 2],
       [3, 4],

@@ -12,17 +12,17 @@ export const distance = (a: { x: number; y: number }, b: { x: number; y: number 
 export const extension = (fileName: string): string | undefined =>
   /(?:\.([^.]+))?$/.exec(fileName)?.[1];
 
-interface Contributor {
+export interface Contributor {
   login: string;
   avatar_url: string;
 }
 
-interface GistFile {
+export interface GistFile {
   filename: string;
   content: string;
 }
 
-interface Gist {
+export interface Gist {
   id: string;
   description: string;
   files: { [key: string]: GistFile };

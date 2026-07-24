@@ -2,7 +2,7 @@ import Tracer from './Tracer';
 import { MarkdownRenderer } from 'core/renderers';
 
 class MarkdownTracer extends Tracer {
-  markdown: string;
+  markdown: string = '';
 
   getRendererClass() {
     return MarkdownRenderer;
