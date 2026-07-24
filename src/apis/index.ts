@@ -9,7 +9,7 @@ type RequestArgs =
 
 const request = <T = unknown>(
   url: string,
-  process: (mappedURL: string, args: unknown[]) => Promise<T>
+  process: (mappedURL: string, args: unknown[]) => PromiseLike<T>
 ) => {
   const tokens = url.split('/');
   const baseURL = /^https?:\/\//i.test(url) ? '' : '/api';
@@ -20,60 +20,64 @@ const request = <T = unknown>(
   };
 };
 
-const GET = (URL: string) => {
-  return request(URL, (mappedURL, args) => {
+const GET = <T = unknown>(URL: string) => {
+  return request<T>(URL, (mappedURL, args) => {
     const [params, cancelToken] = args as [unknown?, CancelToken?];
-    return axios.get(mappedURL, { params, cancelToken });
+    return axios.get(mappedURL, { params, cancelToken }) as unknown as PromiseLike<T>;
   });
 };
 
-const DELETE = (URL: string) => {
-  return request(URL, (mappedURL, args) => {
+const DELETE = <T = unknown>(URL: string) => {
+  return request<T>(URL, (mappedURL, args) => {
     const [params, cancelToken] = args as [unknown?, CancelToken?];
-    return axios.delete(mappedURL, { params, cancelToken });
+    return axios.delete(mappedURL, { params, cancelToken }) as unknown as PromiseLike<T>;
   });
 };
 
-const POST = (URL: string) => {
-  return request(URL, (mappedURL, args) => {
+const POST = <T = unknown>(URL: string) => {
+  return request<T>(URL, (mappedURL, args) => {
     const [body, params, cancelToken] = args as [unknown?, unknown?, CancelToken?];
-    return axios.post(mappedURL, body, { params, cancelToken });
+    return axios.post(mappedURL, body, { params, cancelToken }) as unknown as PromiseLike<T>;
   });
 };
 
-const PUT = (URL: string) => {
-  return request(URL, (mappedURL, args) => {
+const PUT = <T = unknown>(URL: string) => {
+  return request<T>(URL, (mappedURL, args) => {
     const [body, params, cancelToken] = args as [unknown?, unknown?, CancelToken?];
-    return axios.put(mappedURL, body, { params, cancelToken });
+    return axios.put(mappedURL, body, { params, cancelToken }) as unknown as PromiseLike<T>;
   });
 };
 
-const PATCH = (URL: string) => {
-  return request(URL, (mappedURL, args) => {
+const PATCH = <T = unknown>(URL: string) => {
+  return request<T>(URL, (mappedURL, args) => {
     const [body, params, cancelToken] = args as [unknown?, unknown?, CancelToken?];
-    return axios.patch(mappedURL, body, { params, cancelToken });
+    return axios.patch(mappedURL, body, { params, cancelToken }) as unknown as PromiseLike<T>;
   });
 };
 
 export const AlgorithmApi = {
-  getCategories: GET('/algorithms'),
-  getAlgorithm: GET('/algorithms/:categoryKey/:algorithmKey'),
+  getCategories: GET<{ categories: unknown }>('/algorithms'),
+  getAlgorithm: GET<{ algorithm: import('../types').AlgorithmDetail }>(
+    '/algorithms/:categoryKey/:algorithmKey'
+  ),
 };
 
 export const VisualizationApi = {
-  getVisualization: GET('/visualizations/:visualizationId'),
+  getVisualization: GET<string>('/visualizations/:visualizationId'),
 };
 
 export const GitHubApi = {
   auth: (token?: string) =>
     Promise.resolve((axios.defaults.headers.common['Authorization'] = token && `token ${token}`)),
-  getUser: GET('https://api.github.com/user'),
-  listGists: GET('https://api.github.com/gists'),
-  createGist: POST('https://api.github.com/gists'),
-  editGist: PATCH('https://api.github.com/gists/:id'),
-  getGist: GET('https://api.github.com/gists/:id'),
+  getUser: GET<{ login: string; avatar_url: string }>('https://api.github.com/user'),
+  listGists: GET<Array<{ id: string; description: string; files: Record<string, unknown> }>>(
+    'https://api.github.com/gists'
+  ),
+  createGist: POST<import('common/util').Gist>('https://api.github.com/gists'),
+  editGist: PATCH<import('common/util').Gist>('https://api.github.com/gists/:id'),
+  getGist: GET<import('common/util').Gist>('https://api.github.com/gists/:id'),
   deleteGist: DELETE('https://api.github.com/gists/:id'),
-  forkGist: POST('https://api.github.com/gists/:id/forks'),
+  forkGist: POST<import('common/util').Gist>('https://api.github.com/gists/:id/forks'),
 };
 
 export const TracerApi = {

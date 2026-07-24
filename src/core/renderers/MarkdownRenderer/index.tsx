@@ -44,7 +44,9 @@ class MarkdownRenderer extends Renderer<MarkdownTracer> {
             if (!child) return '';
             if (typeof child === 'string') return child;
             if (typeof child === 'object' && 'props' in child)
-              return getText((child as React.ReactElement).props.children);
+              return getText(
+                (child as React.ReactElement<{ children?: React.ReactNode }>).props.children
+              );
             return '';
           })?.join('') || ''
         );
@@ -68,17 +70,17 @@ class MarkdownRenderer extends Renderer<MarkdownTracer> {
     };
 
     const image = ({ src, ...rest }: ImageProps) => {
-      let newSrc = src;
+      let newSrc = src ?? '';
       const style: React.CSSProperties = { maxWidth: '100%' };
       const CODECOGS = 'https://latex.codecogs.com/svg.latex?';
       const WIKIMEDIA_IMAGE = 'https://upload.wikimedia.org/wikipedia/';
       const WIKIMEDIA_MATH = 'https://wikimedia.org/api/rest_v1/media/math/render/svg/';
-      if (src.startsWith(CODECOGS)) {
-        const latex = src.substring(CODECOGS.length);
+      if (newSrc.startsWith(CODECOGS)) {
+        const latex = newSrc.substring(CODECOGS.length);
         newSrc = `${CODECOGS}\\color{White}${latex}`;
-      } else if (src.startsWith(WIKIMEDIA_IMAGE)) {
+      } else if (newSrc.startsWith(WIKIMEDIA_IMAGE)) {
         style.backgroundColor = 'white';
-      } else if (src.startsWith(WIKIMEDIA_MATH)) {
+      } else if (newSrc.startsWith(WIKIMEDIA_MATH)) {
         style.filter = 'invert(100%)';
       }
       return <img src={newSrc} style={style} {...rest} />;
@@ -86,7 +88,7 @@ class MarkdownRenderer extends Renderer<MarkdownTracer> {
 
     return (
       <div className={styles.markdown}>
-        <ReactMarkdown className={styles.content} components={{ heading, link, image }}>
+        <ReactMarkdown className={styles.content} components={{ heading, link, image } as never}>
           {markdown}
         </ReactMarkdown>
       </div>

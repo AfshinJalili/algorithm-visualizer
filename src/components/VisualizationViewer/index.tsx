@@ -1,22 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../store';
 import { setLineIndicator, showErrorToast } from '../../reducers';
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 import * as TracerClasses from 'core/tracers';
 import * as LayoutClasses from 'core/layouts';
+import { Chunk, Command } from '../../types';
 
 interface VisualizationViewerProps {
   className?: string;
-}
-
-interface Command {
-  key: string | null;
-  method: string;
-  args: unknown[];
-}
-
-interface Chunk {
-  commands: Command[];
 }
 
 interface Renderable {
@@ -61,7 +52,7 @@ const VisualizationViewer: React.FC<VisualizationViewerProps> = ({ className }) 
       } else if (method in LayoutClasses) {
         const [children] = args;
         const LayoutClass = (
-          LayoutClasses as Record<string, new (...args: unknown[]) => Renderable>
+          LayoutClasses as unknown as Record<string, new (...args: unknown[]) => Renderable>
         )[method];
         objectsRef.current[key!] = new LayoutClass(
           key!,
@@ -72,7 +63,7 @@ const VisualizationViewer: React.FC<VisualizationViewerProps> = ({ className }) 
         const className = method;
         const [title = className] = args;
         const TracerClass = (
-          TracerClasses as Record<string, new (...args: unknown[]) => Renderable>
+          TracerClasses as unknown as Record<string, new (...args: unknown[]) => Renderable>
         )[className];
         objectsRef.current[key!] = new TracerClass(
           key!,
@@ -124,7 +115,12 @@ const VisualizationViewer: React.FC<VisualizationViewerProps> = ({ className }) 
   }, [chunks, cursor]);
 
   return (
-    <div className={cn("flex-1 flex items-stretch justify-stretch overflow-auto bg-background p-4", className)}>
+    <div
+      className={cn(
+        'flex-1 flex items-stretch justify-stretch overflow-auto bg-background p-4',
+        className
+      )}
+    >
       {rootRef.current && rootRef.current.render()}
     </div>
   );

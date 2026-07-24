@@ -22,7 +22,7 @@ interface Edge {
 }
 
 class GraphRenderer extends Renderer<GraphTracer> {
-  elementRef: React.RefObject<SVGSVGElement>;
+  elementRef: React.RefObject<SVGSVGElement | null>;
   selectedNode: Node | null;
 
   constructor(props: { className?: string; title: string; data: GraphTracer }) {
@@ -33,34 +33,40 @@ class GraphRenderer extends Renderer<GraphTracer> {
 
     this.togglePan(true);
     this.toggleZoom(true);
-  }
 
-  handleMouseDown(e: React.MouseEvent) {
-    super.handleMouseDown && super.handleMouseDown(e);
-    const coords = this.computeCoords(e);
-    const { nodes, dimensions } = this.props.data;
-    const { nodeRadius } = dimensions;
-    this.selectedNode = nodes.find((node: Node) => distance(coords, node) <= nodeRadius) || null;
-  }
+    const baseDown = this.handleMouseDown;
+    this.handleMouseDown = (e: React.MouseEvent) => {
+      baseDown?.(e);
+      const coords = this.computeCoords(e);
+      const { nodes, dimensions } = this.props.data;
+      const { nodeRadius } = dimensions;
+      this.selectedNode = nodes.find((node: Node) => distance(coords, node) <= nodeRadius) || null;
+    };
 
-  handleMouseMove(e: MouseEvent) {
-    if (this.selectedNode) {
-      const { x, y } = this.computeCoords(e);
-      const node = this.props.data.findNode(this.selectedNode.id);
-      node.x = x;
-      node.y = y;
-      this.refresh();
-    } else {
-      super.handleMouseMove && super.handleMouseMove(e);
-    }
+    const baseMove = this.handleMouseMove;
+    this.handleMouseMove = (e: MouseEvent) => {
+      if (this.selectedNode) {
+        const { x, y } = this.computeCoords(e);
+        const node = this.props.data.findNode(this.selectedNode.id);
+        if (!node) return;
+        node.x = x;
+        node.y = y;
+        this.refresh();
+      } else {
+        baseMove(e);
+      }
+    };
   }
 
   computeCoords(e: React.MouseEvent | MouseEvent): { x: number; y: number } {
-    const svg = this.elementRef.current!;
+    const svg = this.elementRef.current;
+    if (!svg) return { x: 0, y: 0 };
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return { x: 0, y: 0 };
     const s = svg.createSVGPoint();
     s.x = e.clientX;
     s.y = e.clientY;
-    const { x, y } = s.matrixTransform(svg.getScreenCTM()!.inverse());
+    const { x, y } = s.matrixTransform(ctm.inverse());
     return { x, y };
   }
 
@@ -127,8 +133,8 @@ class GraphRenderer extends Renderer<GraphTracer> {
               <g
                 className={classes(
                   styles.edge,
-                  selectedCount && styles.selected,
-                  visitedCount && styles.visited
+                  !!selectedCount && styles.selected,
+                  !!visitedCount && styles.visited
                 )}
                 key={`${source}-${target}`}
               >
@@ -156,8 +162,8 @@ class GraphRenderer extends Renderer<GraphTracer> {
             <g
               className={classes(
                 styles.node,
-                selectedCount && styles.selected,
-                visitedCount && styles.visited
+                !!selectedCount && styles.selected,
+                !!visitedCount && styles.visited
               )}
               key={id}
               transform={`translate(${x},${y})`}

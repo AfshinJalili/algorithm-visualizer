@@ -14,7 +14,8 @@ class Tracer {
     this.reset();
   }
 
-  getRendererClass() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getRendererClass(): any {
     return Renderer;
   }
 

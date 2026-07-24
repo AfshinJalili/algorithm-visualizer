@@ -1,5 +1,5 @@
 import React from 'react';
-import ResizableContainer from 'components/ResizableContainer';
+import ResizableContainer, { ResizableContainerRef } from 'components/ResizableContainer';
 
 interface Renderable {
   render: () => React.ReactNode;
@@ -10,7 +10,7 @@ class Layout {
   getObject: (key: string) => Renderable | undefined;
   children: (Renderable | undefined)[];
   weights: number[];
-  ref: React.RefObject<typeof ResizableContainer>;
+  ref: React.RefObject<ResizableContainerRef | null>;
   horizontal: boolean;
 
   constructor(key: string, getObject: (key: string) => Renderable | undefined, children: string[]) {
@@ -18,7 +18,7 @@ class Layout {
     this.getObject = getObject;
     this.children = children.map(key => this.getObject(key));
     this.weights = children.map(() => 1);
-    this.ref = React.createRef();
+    this.ref = React.createRef<ResizableContainerRef>();
     this.horizontal = false;
 
     this.handleChangeWeights = this.handleChangeWeights.bind(this);

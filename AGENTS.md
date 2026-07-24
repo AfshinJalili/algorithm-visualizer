@@ -12,6 +12,6 @@ This repo is the **Algorithm Visualizer** frontend: a Vite + React + TypeScript 
 ### Non-obvious gotchas
 
 - **JavaScript tracing needs the server** even though it runs in the browser: `/api/tracers/js` 302-redirects to the tracer lib on `unpkg.com` (needs outbound internet). C++/Java tracing additionally requires Docker on the server; JS does not.
-- **`npm run type-check` and `npm run validate` fail** (~44 pre-existing TS errors, tracked in `TYPECHECK-ERRORS.md`). This is expected; don't treat it as env breakage.
+- **`npm run type-check` passes** with TypeScript `strict: true`.
 - **`npm run lint` passes** (warnings only, 0 errors).
-- **One test suite fails pre-existing:** `src/core/layouts/Layout.test.tsx` errors resolving `@/lib/utils` because `vitest.config.ts` omits the `@` alias that `vite.config.js` defines. The other 6 suites (21 tests) pass. Run single-shot with `npm test -- --run`.
+- **`npm test -- --run` passes** (7 suites / 26 tests). `vitest.config.ts` includes the `@` path alias matching `vite.config.js`.

@@ -14,7 +14,7 @@ class Element {
 }
 
 class Array2DTracer extends Tracer {
-  data: Element[][];
+  data: Element[][] = [];
 
   getRendererClass() {
     return Array2DRenderer;
